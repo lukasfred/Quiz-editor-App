@@ -4,7 +4,9 @@
 
 **Aplikacja:** Quiz Question Editor (HTML/JS)
 **Wersja docelowa:** 1.0
+**Wersja aktualna:** 0.5.0
 **Data rozpoczęcia:** 2026-01-30
+**Data aktualizacji:** 2026-02-14
 **Autor:** OpenCode AI
 
 ## 🎯 Cel
@@ -31,10 +33,10 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 | 20%      | 0.2     | Modele danych           |
 | 30%      | 0.3     | Lista pytań           |
 | 40%      | 0.4     | Filtrowanie i wyszukiwanie |
-| 50%      | 0.5     | Edytor pytań (basic) |
-| 60%      | 0.6     | Edytor pytań (all types) |
-| 70%      | 0.7     | Obsługa obrazów       |
-| 80%      | 0.8     | Import/Export          |
+| 50%      | 0.5     | Edytor pytań (basic + wszystkie typy) |
+| 60%      | 0.6     | Obsługa obrazów       |
+| 70%      | 0.7     | Podgląd na żywo i poprawki |
+| 80%      | 0.8     | Kompletny Import/Export          |
 | 90%      | 0.9     | Testowanie i poprawki |
 | 100%     | 1.0     | Wersja produkcyjna    |
 
@@ -97,13 +99,13 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 **Cel:** Wyświetlanie listy wszystkich pytań
 
 **Zadania:**
-- [ ] Lista pytań z kartami
-- [ ] Typ pytania (ikona/emoji)
-- [ ] Kategoria i tagi
-- [ ] Trudność (gwiazdki)
-- [ ] Paginacja (50 pytań na stronę)
-- [ ] Licznik pytań
-- [ ] Pusty stan (brak pytań)
+- [x] Lista pytań z kartami
+- [x] Typ pytania (ikona/emoji)
+- [x] Kategoria i tagi
+- [x] Trudność (gwiazdki)
+- [x] Paginacja (50 pytań na stronę)
+- [x] Licznik pytań
+- [x] Pusty stan (brak pytań)
 
 **UI:**
 - Grid lub lista kart
@@ -118,13 +120,13 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 **Cel:** Zaawansowane filtrowanie pytań
 
 **Zadania:**
-- [ ] Wyszukiwanie po tekście (full text search)
-- [ ] Filtrowanie po typie (single/multiple/ordering/pairing)
-- [ ] Filtrowanie po kategorii
-- [ ] Filtrowanie po tagach (multi-select)
-- [ ] Resetowanie filtrów
-- [ ] Dynamiczne tagi z pytań
-- [ ] Licznik wyników
+- [x] Wyszukiwanie po tekście (full text search)
+- [x] Filtrowanie po typie (single/multiple/ordering/pairing)
+- [x] Filtrowanie po kategorii
+- [x] Filtrowanie po tagach (multi-select)
+- [x] Resetowanie filtrów
+- [x] Dynamiczne tagi z pytań
+- [x] Licznik wyników
 
 **UI:**
 - Search bar z ikoną
@@ -140,13 +142,16 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 **Cel:** Formularz tworzenia/edycji pytań
 
 **Zadania:**
-- [ ] Modal formularza
-- [ ] Pola: text, category, tags, explanation, difficulty
-- [ ] Dynamiczne typy pytań (dropdown)
-- [ ] Walidacja w czasie rzeczywistym
-- [ ] Zapisywanie (Create/Update)
-- [ ] Anulowanie
-- [ ] Przycisk "Save & New"
+- [x] Formularz edycji (create/update)
+- [x] Pola: text, category, tags, explanation, difficulty
+- [x] Dynamiczne typy pytań (dropdown)
+- [x] Walidacja w czasie rzeczywistym
+- [x] Zapisywanie (Create/Update)
+- [x] Anulowanie
+- [x] Przycisk "Save & New"
+- [x] Obsługa wszystkich typów pytań (single/multiple/ordering/pairing)
+- [x] Tagi jako chips (dodawanie/usuwanie)
+- [x] Poziom trudności (1-5 gwiazdek)
 
 **Walidacja:**
 - Text nie może być pusty
@@ -159,42 +164,7 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 
 ---
 
-### Krok 6: Edytor pytań - wszystkie typy (v0.6 - 60%)
-**Cel:** Pełne wsparcie dla wszystkich typów pytań
-
-**Zadania:**
-- [ ] Single choice (Radio buttons dla odpowiedzi)
-- [ ] Multiple choice (Checkboxes dla odpowiedzi)
-- [ ] Ordering (drag & drop / przyciski up/down)
-- [ ] Pairing (pary left-right z dodawaniem/usuwaniem)
-- [ ] Podgląd na żywo dla każdego typu
-- [ ] Dynamiczne dodawanie opcji/par
-- [ ] Usuwanie opcji/par
-- [ ] Auto-zaznaczanie poprawnych odpowiedzi
-
-**UI dla typów:**
-
-**Single/Multiple:**
-- Lista opcji z checkbox/radio
-- Przycisk "Add Option"
-- Przycisk "Remove" przy każdej opcji
-
-**Ordering:**
-- Lista opcji z przyciskami up/down
-- Drag & drop (opcjonalnie)
-- Przycisk "Add Option"
-
-**Pairing:**
-- Dwie kolumny: left | right
-- Przycisk "Add Pair"
-- Przycisk "Remove" przy każdej parze
-- Walidacja (left i right nie puste)
-
-**Pliki:** `quiz_editor.html`
-
----
-
-### Krok 7: Obsługa obrazów (v0.7 - 70%)
+### Krok 6: Obsługa obrazów (v0.6 - 60%)
 **Cel:** Dodawanie obrazów do pytań
 
 **Zadania:**
@@ -223,11 +193,61 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 
 ---
 
-### Krok 8: Import/Export (v0.8 - 80%)
+### Krok 7: Podgląd na żywo i poprawki (v0.7 - 70%)
+**Cel:** Dodawanie obrazów do pytań
+
+**Zadania:**
+- [ ] Upload przycisk (file input)
+- [ ] Konwersja do base64 (FileReader)
+- [ ] Podgląd obrazu
+- [ ] Usuwanie obrazu
+- [ ] Optymalizacja rozmiaru (max 1024x1024px)
+- [ ] Walidacja rozmiaru (max 1MB)
+- [ ] Walidacja formatu (JPG, PNG, GIF)
+- [ ] Kompresja jakości (85%)
+
+**UI:**
+- Sekcja "Image" w formularzu
+- Przycisk "Upload Image"
+- Podgląd z przyciskiem "Remove"
+- Informacja o rozmiarze
+- Błędy walidacji
+
+**Technologie:**
+- FileReader API
+- Canvas (do resize)
+- data URI format
+
+**Pliki:** `quiz_editor.html`
+
+---
+
+### Krok 7: Podgląd na żywo i poprawki (v0.7 - 70%)
+**Cel:** Rozszerzona edycja z podglądem
+
+**Zadania:**
+- [ ] Podgląd pytania podczas edycji
+- [ ] Podgląd dla każdego typu (single/multiple/ordering/pairing)
+- [ ] Współczesny design podglądu
+- [ ] Automatyczne odświeżanie podglądu
+- [ ] Poprawki błędów w edytorze
+- [ ] Poprawa walidacji
+- [ ] Ulepszenia UX
+
+**UI:**
+- Sekcja podglądu w edytorze (right sidebar)
+- Stylizacja karty podglądu
+- Animacje przejść
+
+**Pliki:** `quiz_editor.html`
+
+---
+
+### Krok 8: Kompletny Import/Export (v0.8 - 80%)
 **Cel:** Pełna kompatybilność z Androidem
 
 **Zadania:**
-- [ ] Import JSON (file input)
+- [x] Import JSON (file input) - już zaimplementowane
 - [ ] Walidacja formatu JSON
 - [ ] Walidacja kompatybilności (version check)
 - [ ] Merge lub Replace All
@@ -241,7 +261,7 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 ```javascript
 {
   "version": "2.11.0",
-  "exportDate": "2026-01-30T...",
+  "exportDate": "2026-02-14T...",
   "category": "all",
   "totalQuestions": N,
   "questions": [...]
@@ -370,5 +390,5 @@ Wszystkie zmiany w planie będą odnotowane w `changelog.md`.
 ---
 
 **Data utworzenia:** 2026-01-30
-**Ostatnia aktualizacja:** 2026-01-30
-**Status:** Rozpoczęty
+**Ostatnia aktualizacja:** 2026-02-14
+**Status:** W implementacji (50% zrealizowanego planu)

@@ -4,7 +4,19 @@ Jednoplikowa aplikacja HTML/JS do tworzenia i edycji plików pytań quizowych, w
 
 ## 📋 Funkcjonalności
 
-### Wersja v0.3.1 (30% zrealizowanego planu)
+### Wersja v0.5.0 (50% zrealizowanego planu)
+
+✅ **Edytor pytań** - pełny formularz z walidacją w czasie rzeczywistym
+- ✏️ Tworzenie nowych pytań
+- ✏️ Edycja istniejących pytań
+- ⭕ Single Choice - radio buttons
+- ☑️ Multiple Choice - checkboxy
+- 🔢 Ordering - lista z przyciskami up/down
+- 🔗 Pairing - pary left-right
+- 🎯 Walidacja w czasie rzeczywistym
+- 🏷️ Obsługa tagów (chips)
+- ⭐ Wybór poziomu trudności (1-5)
+- 💾 Zapisywanie (Save & New)
 
 ✅ **Lista pytań z kartami**
 - Responsywny grid z kartami pytań
@@ -28,10 +40,9 @@ Jednoplikowa aplikacja HTML/JS do tworzenia i edycji plików pytań quizowych, w
 ✅ **Przełącznik języka (PL/EN)** ⬅️ NOWE!
 - Zlokalizowana aplikacja
 - Preferencja języka zapamiętywana
-- Zmiana języka bez odświeżania strony
-- Lewy górny róg (fixed)
-- Flagi krajów: 🇵🇱 / 🇬🇧
-- Aktualizacja wszystkich tekstów w czasie rzeczywistym
+- Zmiana języka bez odświeżenia strony
+- Bezpieczne funkcje (brak błędów przy brakujących elementach)
+- Konsolowe logi do debugowania
 
 ✅ **Akcje na pytaniach**
 - ✏️ **Edytuj** - (w implementacji, v0.5)
@@ -44,12 +55,14 @@ Jednoplikowa aplikacja HTML/JS do tworzenia i edycji plików pytań quizowych, w
 - 🔢 **Ordering** - ułóż w odpowiedniej kolejności
 - 🔗 **Pairing** - łącz pary
 
+---
+
 ## 🚀 Szybki start
 
 ### Otwórz aplikację w przeglądarce:
 
 ```bash
-cd /home/lukas/opencode/quizadfr/question_app
+cd /home/lukas/opencode/quizadfr/question_app/Quiz-editor-App
 python3 -m http.server 8080
 ```
 
@@ -157,29 +170,56 @@ Alternatywnie, po prostu dwukrotnie kliknij na `quiz_editor.html`
 - LocalStorage
 - Clipboard API
 
-## 📝 Przełącznik języka
+## 🌐 Przełącznik języka
 
-Przełącznik języka znajduje się w **lewym górnym rogu** ekranu:
+### Lokalizacja:
+- Lewy górny róg ekranu (fixed)
+- Pozycja: Top: 1rem, Left: 1rem
+- Z-index: 1000 (nad wszystkimi elementami)
 
-- 🇵🇱 **PL** - Polski język
-- 🇬🇧 **EN** - Angielski język
+### Funkcje:
+- Zmiana języka w czasie rzeczywistym
+- Zapamiętywanie preferencji w localStorage
+- Automatyczna aktualizacja wszystkich tekstów UI
+- Bezpieczne funkcje (brak błędów przy brakujących elementach)
+- Debugowanie w konsoli przeglądarki
 
-Preferowany język jest zapamiętywany w `localStorage` i wczytywany przy następnym uruchomieniu aplikacji.
+### Flagi krajów:
+- 🇵🇱 PL (Polski)
+- 🇬🇧 EN (Angielski)
+
+### Debugowanie:
+W razie z problemami z przełącznikiem, sprawdź konsolę przeglądarki (F12) pod Console).
+
+Szukaj logów:
+```
+Quiz Question Editor v0.3.1 - Initializing...
+Language preference loaded from localStorage: pl (lub en)
+setLanguage() called with: en
+updateAllText() called, language: en
+updateAllText() completed
+```
+
+Jeśli widzisz błędy `Element not found:`, zgłoś je do dokumentacji.
+
+Zobacz też plik `DEBUG_GUIDE.md` szczegółowy przewodnik debugowania.
+
+---
 
 ## 🗺️ Plan rozwoju
 
-### Zrealizowane (30%):
+### Zrealizowane (50%):
 - ✅ v0.1 - Podstawowa struktura HTML/CSS
 - ✅ v0.2 - Modele danych (Question, PairItem)
 - ✅ v0.3 - Lista pytań, statystyki, paginacja
-- ✅ v0.3.1 - Przełącznik języka (PL/EN)
+- ✅ v0.3.1 - Przełącznik języka (PL/EN) z debugowaniem
+- ✅ v0.4 - Filtrowanie i wyszukiwanie
+- ✅ v0.5 - **Edytor pytań basic**
 
 ### Planowane:
-- ⏳ v0.4 - Filtrowanie i wyszukiwanie (40%)
-- ⏳ v0.5 - Edytor pytań basic (50%)
-- ⏳ v0.6 - Edytor pytań all types (60%)
-- ⏳ v0.7 - Obsługa obrazów (70%)
-- ⏳ v0.8 - Import/Export (80%)
+- ⏳ v0.6 - Obsługa obrazów (60%)
+- ⏳ v0.7 - Rozszerzona edycja (podgląd na żywo) (70%)
+- ⏳ v0.8 - Kompletny Import/Export (80%)
 - ⏳ v0.9 - Testowanie i poprawki (90%)
 - ⏳ v1.0 - Wersja produkcyjna (100%)
 
@@ -189,6 +229,7 @@ Preferowany język jest zapamiętywany w `localStorage` i wczytywany przy nastę
 - `plan.md` - szczegółowy plan implementacji
 - `changelog.md` - historia zmian
 - `spanish_a1_questions.json` - przykładowe pytania (100 szt.)
+- `DEBUG_GUIDE.md` - przewodnik debugowania przełącznika języka
 - `README.md` - ten plik - dokumentacja
 
 ## 🤝 Współpraca
@@ -202,7 +243,7 @@ Aplikacja jest częścią projektu QuizApp (Android + Web Editor).
 
 ---
 
-**Wersja aplikacji:** v0.3.1
-**Data:** 2026-01-30
-**Postęp implementacji:** 30%
-**Status:** Wersja deweloperska
+**Wersja aplikacji:** v0.5.0
+**Data:** 2026-02-14
+**Postęp implementacji:** 50%
+**Status:** Edytor pytań basic

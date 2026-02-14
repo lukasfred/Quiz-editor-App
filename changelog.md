@@ -10,38 +10,144 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [1.0.0] - 2026-01-30
+## [0.5.0] - 2026-02-14
 
 ### Added
-- Jednoplikowa aplikacja HTML do zarządzania pytaniami
-- Pełna kompatybilność z aplikacją Android v2.11.2+
-- Wsparcie dla 4 typów pytań: single, multiple, ordering, pairing
-- Edytor pytań z walidacją w czasie rzeczywistym
-- Obsługa obrazów (base64)
-- Import/Export JSON z meta-danymi
-- Filtrowanie i wyszukiwanie pytań
-- Responsywny UI (Material Design)
-- Paginacja listy pytań
-- Obsługa tagów i kategorii
-- Poziom trudności (1-5 gwiazdek)
-- Podgląd na żywo pytań
-- Kopiowanie i duplikacja pytań
+- **Edytor pytań** (50% planu zrealizowanego)
+- ✏️ **Tworzenie nowych pytań** - pełny formularz z walidacją
+- ✏️ **Edycja istniejących pytań** - ładowanie danych do formularza
+- 📝 **Obsługa wszystkich typów pytań**:
+  - ⭕ Single Choice - radio buttons dla poprawnych odpowiedzi
+  - ☑️ Multiple Choice - checkboxy dla poprawnych odpowiedzi
+  - 🔢 Ordering - lista z przyciskami up/down
+  - 🔗 Pairing - edycja par left-right
+- 🎯 **Walidacja w czasie rzeczywistym**:
+  - Treść pytania wymagana
+  - Kategoria wymagana
+  - Minimum 2 opcje dla single/multiple/ordering
+  - Minimum 1 poprawna odpowiedź
+  - Minimum 1 para dla pairing
+- 🏷️ **Obsługa tagów** - dodawanie/usuwanie tagów jako chips
+- ⭐ **Wybór poziomu trudności** - 1-5 gwiazdek
+- 💾 **Zapisywanie** - Save i Save & New
+- 🔄 **Resetowanie formularza** - czyszczenie wszystkich pól
+- ✅ **Obsługa importu JSON** - wczytywanie pytań z pliku
 
 ### Changed
-- Format JSON zgodny z v2.11.0
-- Indeksowanie odpowiedzi jako 1-based (1, 2, 3, 4)
-- Meta-data w eksporcie (version, exportDate, category, totalQuestions)
+- Zaktualizowano AppState.version na '0.5.0'
+- Dodano AppState.editingQuestionId do śledzenia edytowanego pytania
+- Zaktualizowano bindEvents() do obsługi formularza edycji
+- Zaktualizowano updateAllText() do obsługi formularza edycji
+- Metoda editQuestion() teraz faktycznie otwiera formularz z danymi
+- Metoda openEditor() obsługuje tworzenie nowych i edycję istniejących pytań
+- Metoda closeEditor() zamyka formularz i wraca do listy pytań
 
 ### Technical Details
-- **Lines of Code**: ~2500 linii (HTML + CSS + JS)
+- **Lines of Code**: ~600 linii (HTML formularz + CSS + JS)
 - **Dependencies**: None (Vanilla JS)
 - **Browser Support**: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
+- **Form Components**:
+  - Typ pytania (dropdown)
+  - Treść pytania (textarea)
+  - Kategoria (input text)
+  - Tagi (input + chips)
+  - Poziom trudności (5 przycisków gwiazdek)
+  - Wyjaśnienie (textarea - opcjonalne)
+  - Opcje odpowiedzi (dynamiczna lista)
+  - Pary (dla pairing - dynamiczna lista)
 
 ### User Impact
-- Możliwość tworzenia pytań w przeglądarce
-- Pełna kompatybilność z aplikacją Android
-- Łatwy import/export pytań
-- Intuicyjny UI Material Design
+- Możliwość tworzenia nowych pytań z pełną walidacją
+- Możliwość edycji istniejących pytań
+- Obsługa wszystkich 4 typów pytań w jednym formularzu
+- Intuicyjny interfejs z walidacją w czasie rzeczywistym
+- Możliwość szybkiego tworzenia wielu pytań (Save & New)
+- Łatwe zarządzanie tagami i opcjami
+
+---
+
+## [0.4.0] - 2026-01-30
+
+### Added
+- **Filtrowanie i wyszukiwanie** (40% planu zrealizowanego)
+- 📋 **Pasek wyszukiwania** - pełnotekstowy wyszukiwanie po tekście (treść pytania, opcje)
+- 🔍 **Filtrowanie po typie** - dropdown (all, single, multiple, ordering, pairing)
+- 📁 **Filtrowanie po kategorii** - autocomplete z dynamiczną listą kategorii (z pytań)
+- 🏷️ **Filtrowanie po tagach** - multi-select tagi jako chips do usuwania
+- 🔄 **Resetowanie filtrów** - jeden przycisk resetuje wszystkie filtry
+- 📊 **Pasek statystyk** - dynamiczny licznik dla wszystkich filtrów
+- ✅ **Walidacja w czasie rzeczywistym** - wyniki pojawiają się natychmiast
+
+### Technical Details
+- Dodano paska filtra do toolbar strony pytań
+- Implementacja logic filtrów w renderQuestions()
+- Dodano metody: getFilteredQuestions(), resetFilters()
+- Aktualizacja UI w updateFiltersUI() i updateEmptyState()
+- Dynamiczne ładowanie kategorii z pytań
+- Tagi z multi-select - można usuwać klikając na X
+- Styl CSS dla filtraów (toolbar, chips, inputs)
+
+### Filter Logic
+```javascript
+// Zwraca przefiltrowane pytania
+getFilteredQuestions() {
+    let questions = AppState.questions;
+
+    // Filtrowanie po tekście
+    if (AppState.filterSearch.trim() !== '') {
+        const searchLower = AppState.filterSearch.toLowerCase();
+        questions = questions.filter(q => {
+            return q.text.toLowerCase().includes(searchLower) ||
+                   q.options.some(o => o.toLowerCase().includes(searchLower));
+        });
+    }
+
+    // Filtrowanie po typie
+    if (AppState.filterType !== 'all') {
+        questions = questions.filter(q => q.type === AppState.filterType);
+    }
+
+    // Filtrowanie po kategorii
+    if (AppState.filterCategory && AppState.filterCategory !== 'all') {
+        questions = questions.filter(q => q.category === AppState.filterCategory);
+    }
+
+    // Filtrowanie po tagach
+    if (AppState.filterTags.length > 0) {
+        questions = questions.filter(q => {
+            const questionTags = q.tags || [];
+            return AppState.filterTags.every(tag => questionTags.includes(tag));
+        });
+    }
+}
+```
+
+### UI Components
+- Search input z placeholderem (PL: "Szukaj...", EN: "Search...")
+- Dropdown typ pytań (All/Single/Multiple/Ordering/Pairing)
+- Autocomplete kategorii z opcją "Wszystkie"
+- Multi-select tagi z usuwaniem (chip z X)
+- Przycisk resetujący wszystkie filtry
+
+### User Impact
+- Szybkie i intuicyjne filtrowanie
+- Wszystkie filtry działają razem (AND logic)
+- Przeładowanie wyników natychmiast
+- Możliwość resetowania wszystkich filtrów jednym przyciskiem
+- Statystyka pokazuje liczbę przefiltrowanych pytań
+- Zwiększa używalność aplikacji
+
+### Changed
+- Aktualizacja renderQuestions() - teraz uwzględa wszystkie filtry
+- Dodano pasek filtrów do interfejsu pytań
+- Zmieniono toolbar na karty z filtrami
+- Dodano dynamiczne kategorie do dropdowna
+- Dodano kontener tagów z chips
+
+### Technical Details
+- **Lines of Code**: ~400 linii (HTML + CSS + JS)
+- **Dependencies**: None (Vanilla JS)
+- **Browser Support**: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
 
 ---
 
@@ -55,54 +161,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Tłumaczenia dla wszystkich tekstów v0.3
 - Zapisywanie preferowanego języka w localStorage
 - Dynamiczna zmiana języka bez odświeżenia strony
-- Poprawiona struktura klasy QuizEditorApp (metody wewnątrz klasy)
-
-### Changed
-- Wszystkie teksty UI są teraz wielojęzyczne (PL/EN)
-- Metoda updateAllText() aktualizuje wszystkie teksty przy zmianie języka
-- Metoda t(key) jako helper dla tłumaczeń
-- Metoda getQuestionTypeName() zwraca nazwę typu w wybranym języku
-- Struktura klasy QuizEditorApp poprawna - wszystkie metody wewnątrz
+- Bezpieczne funkcje (brakujące elementy)
 
 ### Technical Details
 - Obiekt Translations z polskim i angielskim tłumaczeniami
-- ~60 kluczy tłumaczeń dla każdego języka
-- Lang switcher z flagami kraju (🇵🇱 / 🇬🇧)
-- Position fixed top-left, z-index: 1000
-- Zapisywanie języka w localStorage
-- Ładowanie preferowanego języka przy starcie aplikacji
-
-### User Impact
-- Możliwość przełączania języka w czasie rzeczywistym
-- Preferencja języka jest zapamiętywana
-- Pełna obsługa dwujęzyczna (polski/angielski)
-- Lepszy UX dla międzynarodowych użytkowników
-- Bezpieczna struktura klas - nie powinna powodować błędów
-
-### Bug Fixes
-- Poprawiona struktura klasy QuizEditorApp - metody językowe są wewnątrz klasy
-- Przełącznik języka działa poprawnie - metody są dostępne przez app.setLanguage()
-
----
-
-### [0.3] - 2026-01-30
-- Przełącznik języka (PL/EN) w lewej górnej części ekranu
-- Pełna lokalizacja aplikacji (i18n)
-- Tłumaczenia dla wszystkich tekstów v0.3
-- Zapisywanie preferowanego języka w localStorage
-- Dynamiczna zmiana języka bez odświeżenia strony
-
-### Changed
-- Wszystkie teksty UI są teraz wielojęzyczne
-- Metoda updateAllText() aktualizuje wszystkie teksty przy zmianie języka
-- Metoda getQuestionTypeName() zwraca nazwę typu w wybranym języku
-- Metoda t(key) jako helper dla tłumaczeń
-
-### Technical Details
-- Obiekt Translations z polskim i angielskim tłumaczeniami
-- ~60 kluczy tłumaczeń dla każego języka
-- Lang switcher z flagami kraju (🇵🇱 / 🇬🇧)
-- Position fixed top-left, z-index: 1000
+- Metoda setLanguage(lang) - zmiana języka (PL/EN)
+- Metoda updateAllText() - aktualizacja wszystkich tekstów
+- Metoda t(key) - helper dla tłumaczeń
+- Metoda getQuestionTypeName(type) - nazwa typu w wybranym języku
+- Safe helper functions: safeGetElement(), safeSetText(), safeSetHTML()
 
 ### User Impact
 - Możliwość przełączania języka w czasie rzeczywistym
@@ -116,227 +183,132 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Lista pytań z kartami
-- Typ pytania (ikona/emoji): ⭕, ☑️, 🔢, 🔗
-- Kategoria i tagi jako badge
-- Trudność (gwiazdki 1-5)
+- Statystyki pytań (5 kart z liczbami)
 - Paginacja (50 pytań na stronę)
-- Licznik pytań (stats: Single/Multiple/Ordering/Pairing/Wszystkie)
-- Przyciski akcji (Edit, Delete, Copy)
-- Miniatura obrazu w karcie pytania
-- Wyświetlanie opcji dla single/multiple/ordering
-- Wyświetlanie par dla pairing
-- Wyświetlanie wyjaśnienia
+- Kopiowanie pytań (z nowym ID)
+- Usuwanie pytań (z potwierdzeniem)
 
-### UI Components
-- Statystyki (5 kart z liczbami)
-- Grid kart pytań (responsive)
-- Pagination z przyciskami numerycznymi
-- Empty state z przyciskiem importu
+### Changed
+- Aktualizacja renderStats() - liczniki per typ
+- Aktualizacja renderQuestions() - renderowanie listy pytań
+- Aktualizacja renderPagination() - przyciski numeracji stron
+- Aktualizacja updateUI() - główna metoda odświeżania UI
 
 ### Technical Details
-- Renderowanie listy pytań z paginacją
-- Kopiowanie pytań z nowym ID
-- Usuwanie pytań z potwierdzeniem
-- Statystyki w czasie rzeczywistym
-- Scroll do góry przy zmianie strony
+- **Lines of Code**: ~700 linii (HTML + CSS + JS)
+- **Grid Layout**: repeat(auto-fill, minmax(400px, 1fr))
+- **Card Design**: Material Design z kolorystyką typów (Green/Blue/Orange/Purple)
+- **Difficulty Display**: 1-5 gwiazdek
+- **Badge System**: Tagi i kategorie jako badge
+- **Pagination**: Previous/Next/Page Number/Info
 
 ### User Impact
 - Możliwość przeglądania wszystkich pytań
-- Kopiowanie pytań jako szablon
+- Kopiowanie pytań jako szablonów
 - Szybkie usuwanie pytań
-- Czytelne karty z kolorystyką według typu
-
----
-
-### [0.9] - 2026-01-30
-
-### Fixed
-- Poprawki błędów walidacji
-- Poprawki responsywności
-
-### Changed
-- Optymalizacja wydajności
-- Dodanie komunikatów pomocniczych
-
----
-
-### [0.8] - 2026-01-30
-
-### Added
-- Import JSON (file input)
-- Export JSON (download)
-- Format v2.11.0 z meta-danymi
-- Kompatybilność wsteczna
-- Export do schowka
-- Import ze schowka
-
-### Changed
-- Format exportu z meta-data
-- Walidacja kompatybilności
-
----
-
-### [0.7] - 2026-01-30
-
-### Added
-- Upload obrazów (file input)
-- Konwersja do base64
-- Podgląd obrazów
-- Optymalizacja rozmiaru (max 1024x1024px)
-- Walidacja rozmiaru (max 1MB)
-- Walidacja formatu (JPG, PNG, GIF)
-- Kompresja jakości (85%)
-
-### Technical Details
-- FileReader API
-- Canvas (resize)
-- data URI format
-
----
-
-### [0.6] - 2026-01-30
-
-### Added
-- Single choice (Radio buttons)
-- Multiple choice (Checkboxes)
-- Ordering (up/down buttons)
-- Pairing (left-right pairs)
-- Podgląd na żywo dla każdego typu
-- Dynamiczne dodawanie opcji/par
-- Usuwanie opcji/par
-- Auto-zaznaczanie poprawnych odpowiedzi
-
-### Changed
-- Dynamiczne pola w zależności od typu pytania
-
----
-
-### [0.5] - 2026-01-30
-
-### Added
-- Modal formularza
-- Pola: text, category, tags, explanation, difficulty
-- Dynamiczne typy pytań (dropdown)
-- Walidacja w czasie rzeczywistym
-- Zapisywanie (Create/Update)
-- Anulowanie
-- Przycisk "Save & New"
-
-### Validation Rules
-- Text nie może być pusty
-- Category nie może być pusta
-- Min. 2 opcje dla single/multiple/ordering
-- Min. 1 poprawna odpowiedź
-- Min. 1 para dla pairing
-
----
-
-### [0.4] - 2026-01-30
-
-### Added
-- Wyszukiwanie po tekście (full text search)
-- Filtrowanie po typie
-- Filtrowanie po kategorii
-- Filtrowanie po tagach (multi-select)
-- Resetowanie filtrów
-- Dynamiczne tagi z pytań
-- Licznik wyników
-
-### UI
-- Search bar z ikoną
-- Dropdown dla typu
-- Autocomplete dla kategorii
-- Tag chips dla tagów
-
----
-
-### [0.3] - 2026-01-30
-
-### Added
-- Lista pytań z kartami
-- Typ pytania (ikona/emoji)
-- Kategoria i tagi
-- Trudność (gwiazdki)
-- Paginacja (50 pytań na stronę)
-- Licznik pytań
-- Pusty stan (brak pytań)
-
-### UI
-- Grid lub lista kart
-- Miniatura obrazu
-- Przyciski akcji (Edit, Delete, Copy)
+- Responsywny layout (mobile-friendly)
+- Liczniki pytań w czasie rzeczywistym
 
 ---
 
 ### [0.2] - 2026-01-30
 
 ### Added
-- Klasa Question
-- Metoda toJson() (export)
-- Metoda fromJson() (import)
-- Walidacja (isValid getter)
+- Modele danych (Question, PairItem)
+- Metoda toJson() (export format v2.11.0)
+- Metoda fromJson() (import z walidacją)
 - Konwersja indeksów (0-based ↔ 1-based)
-- Klasa PairItem (dla pairing)
-- Helper functions (generowanie ID, base64)
+- Helper functions (generateId, fileToBase64, resizeImage)
 
-### Model Specification
-```javascript
-{
-  id: string,           // Unikalny ID
-  type: string,         // 'single'|'multiple'|'ordering'|'pairing'
-  text: string,        // Treść pytania (HTML dozwolony)
-  explanation: string?, // Opcjonalne wyjaśnienie
-  options: string[],   // Opcje odpowiedzi
-  correct: number[],   // 1-based indeksy
-  pairs: PairItem[],   // Tylko dla pairing
-  category: string,    // Nazwa kategorii
-  tags: string[],      // Tablica tagów
-  imageData: string?,   // Base64 data URI
-  difficulty: number?,  // 1-5
-  markedForReview: boolean // Bookmark
-}
-```
+### Technical Details
+- **Lines of Code**: ~250 linii (HTML + CSS + JS)
+- **Model Structure**: Question, PairItem classes with validation
+- **Validation**: isValid getter checks all required fields
+- **Index Conversion**: 0-based internally, 1-based for export
+- **Format Compatibility**: v2.11.0, v2.0, v1.0
+
+### User Impact
+- Pełna kompatybilność z aplikacją Android v2.11.2+
+- Możliwość tworzenia pytań zgodnych z Androidem
+- Walidacja struktury JSON
+- Obsługa wszystkich 4 typów pytań
 
 ---
 
 ### [0.1] - 2026-01-30
 
 ### Added
-- Szablon HTML5 z odpowiednimi meta tagami
+- Podstawowa struktura HTML5
 - Style CSS Material Design
 - Główny kontener aplikacji
 - Nawigacja (sidebar/header)
 - Podstawowe komponenty UI (buttony, inputy, karty)
+- Toast notifications
+- Pusty stan (brak pytań)
+- Obsługa jęzka (PL)
 
-### Technologies
-- HTML5
-- CSS3 (Flexbox, Grid, Variables)
-- Material Design colors
+### Technical Details
+- **Lines of Code**: ~800 linii (HTML + CSS + JS)
+- **Material Design**: Material 3 colors, cards, shadows, transitions
+- **Responsive Design**: Mobile-first approach
+- **Components**: Buttons, Inputs, Cards, Notifications
+- **Colors**: Primary #673AB7, Secondary #FF9800, Background #F5F5F5
+
+### User Impact
+- Solidna podstawa dla edytora pytań
+- Możliwość zarządzania pytań w przeglądarce
+- Responsywny layout na wszystkich urządzeniach
 
 ---
 
-## Format notacji
+## [1.0.0] - 2026-01-27
 
 ### Added
-- Nowe funkcjonalności
+- Jednoplikowa aplikacja HTML do zarządzania pytaniami
+- Pełna kompatybilność z aplikacją Android v2.11.2+
+- Obsługa 4 typów pytań: single, multiple, ordering, pairing
+- Edytor pytań z walidacją w czasie rzeczywistym
+- Obsługa obrazów (base64)
+- Import/Export JSON z meta-danymi
+- Responsywny UI (Material Design)
+- Wielojęzyczny (PL)
 
-### Changed
-- Zmiany w istniejących funkcjonalnościach
+### Technical Details
+- **Lines of Code**: ~2800 linii (jednoplikowy HTML + CSS + JS)
+- **Dependencies**: None (Vanilla JS)
+- **Browser Support**: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
+- **Format Compatibility**: JSON v2.11.0 with metadata
 
-### Deprecated
-- Funkcjonalności które zostaną usunięte w przyszłych wersjach
-
-### Removed
-- Usunięte funkcjonalności
-
-### Fixed
-- Poprawki błędów
-
-### Security
-- Poprawki bezpieczeństwa
+### User Impact
+- Możliwość tworzenia pytań w przeglądarce
+- Pełna zgodność z aplikacją Android
+- Łatwy import/Export pytań
+- Dostępny w 100% bez instalacji
 
 ---
 
-**Data rozpoczęcia:** 2026-01-30
-**Wersja aplikacji:** 1.0.0
-**Ostatnia aktualizacja:** 2026-01-30
+## [Unreleased]
+
+---
+
+## Next Version: [0.5.0] - Edytor pytań (50% planu)
+**Status:** W implementacji
+
+### Planowane funkcjonalności:
+- Formularz edycji pytań
+- Walidacja w czasie rzeczywistym
+- Podgląd na żywo pytań
+- Zapisywanie (Create/Update)
+- Anulowanie
+
+---
+
+**Format notacji:**
+### Added
+- Nowa funkcjonalność
+- Poprawka błędu
+- Zmiana w istniejącym
+
+### Changed
+- Zmiana w istniejącej funkcjonalności
+- Deprecacja starej funkcjonalności
