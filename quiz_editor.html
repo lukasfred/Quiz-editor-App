@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quiz Question Editor - Create and edit quiz questions compatible with Android app v2.11.2+">
+    <title>Quiz Question Editor v0.3.1</title>
+
+    <style>
+        /* ==================== CSS VARIABLES ==================== */
+        :root {
+            --primary-color: #673AB7;
+            --primary-dark: #320B86;
+            --secondary-color: #FF9800;
+            --background-color: #F5F5F5;
+            --surface-color: #FFFFFF;
+            --error-color: #F44336;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-color: #E0E0E0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.14);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        /* ==================== RESET ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ==================== LANGUAGE SWITCHER ==================== */
+        .language-switcher {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .lang-btn:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(103, 58, 183, 0.1);
+        }
+
+        .lang-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* ==================== LAYOUT ==================== */
+        #app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--surface-color);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .sidebar-version {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(103, 58, 183, 0.1);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: var(--transition);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ==================== TYPOGRAPHY ==================== */
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* ==================== CARDS ==================== */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(103, 58, 183, 0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        /* ==================== INPUTS ==================== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(103, 58, 183, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: var(--background-color);
+            cursor: not-allowed;
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* ==================== BADGES ==================== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-primary {
+            background-color: rgba(103, 58, 183, 0.1);
+            color: var(--primary-color);
+        }
+
+        .badge-secondary {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .badge-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-danger {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+        }
+
+        /* ==================== TOAST NOTIFICATIONS ==================== */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .toast {
+            background-color: var(--surface-color);
+            border-left: 4px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.75rem;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast.success {
+            border-color: var(--success-color);
+        }
+
+        .toast.error {
+            border-color: var(--error-color);
+        }
+
+        .toast.warning {
+            border-color: var(--warning-color);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ==================== EMPTY STATE ==================== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* ==================== UTILITIES ==================== */
+        .hidden {
+            display: none !important;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* ==================== QUESTIONS LIST ==================== */
+        .questions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .question-card {
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .question-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .question-card.single {
+            border-left-color: #4CAF50;
+        }
+
+        .question-card.multiple {
+            border-left-color: #2196F3;
+        }
+
+        .question-card.ordering {
+            border-left-color: #FF9800;
+        }
+
+        .question-card.pairing {
+            border-left-color: #9C27B0;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .question-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .question-text img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius-md);
+            margin: 0.5rem 0;
+        }
+
+        .question-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-stars {
+            color: #FFC107;
+            letter-spacing: 2px;
+        }
+
+        .question-options {
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-option {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .question-option:last-child {
+            border-bottom: none;
+        }
+
+        .question-option-marker {
+            font-weight: 600;
+            min-width: 24px;
+        }
+
+        .question-option.correct {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .question-pairs {
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-pair {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .question-pair:last-child {
+            border-bottom: none;
+        }
+
+        .question-pair-left,
+        .question-pair-right {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: var(--surface-color);
+            border-radius: var(--radius-sm);
+        }
+
+        .question-pair-arrow {
+            margin: 0 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .question-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .question-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .question-explanation {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+        }
+
+        /* ==================== PAGINATION ==================== */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--surface-color);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            background-color: rgba(103, 58, 183, 0.1);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* ==================== QUESTIONS STATS ==================== */
+        .questions-stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background-color: var(--surface-color);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.7;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .stat-card.single {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .stat-card.multiple {
+            border-left: 4px solid #2196F3;
+        }
+
+        .stat-card.ordering {
+            border-left: 4px solid #FF9800;
+        }
+
+        .stat-card.pairing {
+            border-left: 4px solid #9C27B0;
+        }
+
+        /* ==================== IMAGE THUMBNAIL ==================== */
+        .question-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+        }
+
+        .question-image-placeholder {
+            width: 100%;
+            height: 100px;
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sidebar-toggle {
+                display: none;
+            }
+        }
+
+        /* ==================== ICONS (using Unicode for now) ==================== */
+        .icon {
+            display: inline-block;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button class="lang-btn active" id="lang-pl" onclick="app.setLanguage('pl')">
+            🇵🇱 PL
+        </button>
+        <button class="lang-btn" id="lang-en" onclick="app.setLanguage('en')">
+            🇬🇧 EN
+        </button>
+    </div>
+
+    <div id="app">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">Quiz Editor</h1>
+                <span class="sidebar-version">v0.3.1</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-page="questions">
+                        <span class="nav-icon">📋</span>
+                        Pytania
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="create">
+                        <span class="nav-icon">➕</span>
+                        Nowe pytanie
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="import-export">
+                        <span class="nav-icon">📥</span>
+                        Import/Export
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="help">
+                        <span class="nav-icon">❓</span>
+                        Pomoc
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Questions Page -->
+            <section id="questions-page" class="page active">
+                <!-- Stats -->
+                <div class="questions-stats" id="questions-stats">
+                    <div class="stat-card single">
+                        <span class="stat-icon">⭕</span>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-single">0</div>
+                            <div class="stat-label">Single</div>
+                        </div>
+                    </div>
+                    <div class="stat-card multiple">
+                        <span class="stat-icon">☑️</span>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-multiple">0</div>
+                            <div class="stat-label">Multiple</div>
+                        </div>
+                    </div>
+                    <div class="stat-card ordering">
+                        <span class="stat-icon">🔢</span>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-ordering">0</div>
+                            <div class="stat-label">Ordering</div>
+                        </div>
+                    </div>
+                    <div class="stat-card pairing">
+                        <span class="stat-icon">🔗</span>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-pairing">0</div>
+                            <div class="stat-label">Pairing</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">📋</span>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-total">0</div>
+                            <div class="stat-label">Wszystkie</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Lista pytań</h2>
+                        <button class="btn btn-primary btn-sm" id="add-question-btn">
+                            <span class="icon">➕</span>
+                            Nowe pytanie
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Questions List -->
+                <div class="questions-list" id="questions-list">
+                    <!-- Questions will be rendered here -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state hidden" id="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h3 class="empty-title">Brak pytań</h3>
+                    <p>Rozpocznij od utworzenia pierwszego pytania lub zaimportuj je z pliku JSON.</p>
+                    <button class="btn btn-primary mt-4" onclick="app.navigateTo('import-export')">
+                        <span class="icon">📥</span>
+                        Importuj z pliku
+                    </button>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination hidden" id="pagination">
+                    <div class="pagination-info" id="pagination-info">
+                        Wyświetlane 0-0 z 0 pytań
+                    </div>
+                    <div class="pagination-controls" id="pagination-controls">
+                        <!-- Pagination buttons will be rendered here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Create Page -->
+            <section id="create-page" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Edytor pytań</h2>
+                        <div class="flex gap-2">
+                            <button class="btn btn-outline btn-sm" id="cancel-btn">
+                                Anuluj
+                            </button>
+                            <button class="btn btn-primary btn-sm" id="save-btn">
+                                <span class="icon">💾</span>
+                                Zapisz
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-center">
+                        Edytor pytań jest w trakcie implementacji.
+                        <br>
+                        Wersja 0.3.1 zawiera podstawową strukturę UI.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Import/Export Page -->
+            <section id="import-export-page" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Import/Export</h2>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Import pytań</label>
+                        <input type="file" class="form-control" id="import-file" accept=".json">
+                        <p class="text-secondary mt-4">Wybierz plik JSON z pytaniami do zaimportowania.</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Eksport pytań</label>
+                        <button class="btn btn-primary" id="export-btn">
+                            <span class="icon">📤</span>
+                            Eksportuj do pliku
+                        </button>
+                        <p class="text-secondary mt-4">Eksportuje wszystkie pytania do formatu JSON v2.11.0.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Help Page -->
+            <section id="help-page" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Pomoc</h2>
+                    </div>
+                    <h3>Quiz Question Editor v0.3.1</h3>
+                    <p>
+                        Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.
+                    </p>
+                    <h3>Obsługiwane typy pytań:</h3>
+                    <ul>
+                        <li>✅ <strong>Single Choice</strong> - jedna poprawna odpowiedź</li>
+                        <li>✅ <strong>Multiple Choice</strong> - wiele poprawnych odpowiedzi</li>
+                        <li>✅ <strong>Ordering</strong> - ułóż w odpowiedniej kolejności</li>
+                        <li>✅ <strong>Pairing</strong> - łącz pary</li>
+                    </ul>
+                    <h3>Funkcje:</h3>
+                    <ul>
+                        <li>✅ Tworzenie pytań</li>
+                        <li>⏳ Edycja pytań (w implementacji)</li>
+                        <li>⏳ Dodawanie obrazów (w implementacji)</li>
+                        <li>⏳ Import/Export JSON (w implementacji)</li>
+                        <li>⏳ Filtrowanie i wyszukiwanie (w implementacji)</li>
+                    </ul>
+                    <p class="text-secondary mt-4">
+                        <strong>Status:</strong> Wersja 0.3.1 - lista pytań + i18n<br>
+                        <strong>Postęp:</strong> 30% zrealizowanego planu
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toast-container"></div>
+    </div>
+
+    <script>
+        // ==================== STRING PROTOTYPE EXTENSIONS ====================
+        String.prototype.isEmpty = function() {
+            return this.trim().length === 0;
+        };
+
+        // ==================== APP STATE ====================
+        const AppState = {
+            currentPage: 'questions',
+            questions: [],
+            version: '0.3.1',
+            currentPageIndex: 0,
+            itemsPerPage: 50,
+            language: 'pl' // 'pl' or 'en'
+        };
+
+        // ==================== TRANSLATIONS ====================
+        const Translations = {
+            pl: {
+                // Navigation
+                nav_questions: 'Pytania',
+                nav_create: 'Nowe pytanie',
+                nav_import_export: 'Import/Export',
+                nav_help: 'Pomoc',
+
+                // Questions page
+                stats_single: 'Single',
+                stats_multiple: 'Multiple',
+                stats_ordering: 'Ordering',
+                stats_pairing: 'Pairing',
+                stats_total: 'Wszystkie',
+                list_title: 'Lista pytań',
+                add_question: 'Nowe pytanie',
+                empty_title: 'Brak pytań',
+                empty_text: 'Rozpocznij od utworzenia pierwszego pytania lub zaimportuj je z pliku JSON.',
+                import_btn: 'Importuj z pliku',
+
+                // Question cards
+                type_single: 'Single Choice',
+                type_multiple: 'Multiple Choice',
+                type_ordering: 'Ordering',
+                type_pairing: 'Pairing',
+                edit_btn: 'Edytuj',
+                copy_btn: 'Kopiuj',
+                delete_btn: 'Usuń',
+                difficulty_tooltip: 'Poziom trudności',
+                no_category: 'Bez kategorii',
+                explanation_label: 'Wyjaśnienie:',
+
+                // Pagination
+                showing: 'Wyświetlane',
+                of: 'z',
+                questions: 'pytań',
+                prev_btn: 'Wstecz',
+                next_btn: 'Dalej',
+
+                // Create page
+                editor_title: 'Edytor pytań',
+                cancel_btn: 'Anuluj',
+                save_btn: 'Zapisz',
+                impl_warning: 'W implementacji',
+                impl_text: 'Edytor pytań jest w trakcie implementacji.',
+                status_0_3_1: 'Wersja 0.3.1 - lista pytań + i18n',
+                progress_0_3_1: 'Postęp: 30% zrealizowanego planu',
+
+                // Import/Export
+                import_title: 'Import pytań',
+                import_label: 'Wybierz plik JSON z pytaniami do zaimportowania.',
+                export_title: 'Eksport pytań',
+                export_btn: 'Eksportuj do pliku',
+                export_text: 'Eksportuje wszystkie pytania do formatu JSON v2.11.0.',
+
+                // Help page
+                help_title: 'Pomoc',
+                app_version: 'Quiz Question Editor v0.3.1',
+                app_desc: 'Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.',
+                supported_types: 'Obsługiwane typy pytań:',
+                type_single_desc: 'jedna poprawna odpowiedź',
+                type_multiple_desc: 'wiele poprawnych odpowiedzi',
+                type_ordering_desc: 'ułóż w odpowiedniej kolejności',
+                type_pairing_desc: 'łącz pary',
+                features_title: 'Funkcje:',
+                feature_create: 'Tworzenie pytań',
+                feature_edit: 'Edycja pytań',
+                feature_images: 'Dodawanie obrazów',
+                feature_import_export: 'Import/Export JSON',
+                feature_filtering: 'Filtrowanie i wyszukiwanie',
+                status_label: 'Status:',
+
+                // Toast messages
+                toast_success: 'Sukces',
+                toast_warning: 'Ostrzeżenie',
+                toast_error: 'Błąd',
+
+                // Actions
+                copy_success: 'Pytanie zostało skopiowane!',
+                delete_success: 'Pytanie zostało usunięte!',
+                delete_confirm: 'Czy na pewno chcesz usunąć to pytanie?',
+
+                // Stats
+                questions_count: 'pytań'
+            },
+            en: {
+                // Navigation
+                nav_questions: 'Questions',
+                nav_create: 'New Question',
+                nav_import_export: 'Import/Export',
+                nav_help: 'Help',
+
+                // Questions page
+                stats_single: 'Single',
+                stats_multiple: 'Multiple',
+                stats_ordering: 'Ordering',
+                stats_pairing: 'Pairing',
+                stats_total: 'All',
+                list_title: 'Questions List',
+                add_question: 'New Question',
+                empty_title: 'No Questions',
+                empty_text: 'Start by creating your first question or import them from a JSON file.',
+                import_btn: 'Import from file',
+
+                // Question cards
+                type_single: 'Single Choice',
+                type_multiple: 'Multiple Choice',
+                type_ordering: 'Ordering',
+                type_pairing: 'Pairing',
+                edit_btn: 'Edit',
+                copy_btn: 'Copy',
+                delete_btn: 'Delete',
+                difficulty_tooltip: 'Difficulty level',
+                no_category: 'No category',
+                explanation_label: 'Explanation:',
+
+                // Pagination
+                showing: 'Showing',
+                of: 'of',
+                questions: 'questions',
+                prev_btn: 'Previous',
+                next_btn: 'Next',
+
+                // Create page
+                editor_title: 'Question Editor',
+                cancel_btn: 'Cancel',
+                save_btn: 'Save',
+                impl_warning: 'In Development',
+                impl_text: 'Question editor is under development.',
+                status_0_3_1: 'Version 0.3.1 - Questions List + i18n',
+                progress_0_3_1: 'Progress: 30% of implementation plan',
+
+                // Import/Export
+                import_title: 'Import Questions',
+                import_label: 'Select JSON file with questions to import.',
+                export_title: 'Export Questions',
+                export_btn: 'Export to file',
+                export_text: 'Exports all questions to JSON v2.11.0 format.',
+
+                // Help page
+                help_title: 'Help',
+                app_version: 'Quiz Question Editor v0.3.1',
+                app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
+                supported_types: 'Supported question types:',
+                type_single_desc: 'one correct answer',
+                type_multiple_desc: 'multiple correct answers',
+                type_ordering_desc: 'arrange in correct order',
+                type_pairing_desc: 'match pairs',
+                features_title: 'Features:',
+                feature_create: 'Create questions',
+                feature_edit: 'Edit questions',
+                feature_images: 'Add images',
+                feature_import_export: 'Import/Export JSON',
+                feature_filtering: 'Filtering and search',
+                status_label: 'Status:',
+
+                // Toast messages
+                toast_success: 'Success',
+                toast_warning: 'Warning',
+                toast_error: 'Error',
+
+                // Actions
+                copy_success: 'Question copied successfully!',
+                delete_success: 'Question deleted successfully!',
+                delete_confirm: 'Are you sure you want to delete this question?',
+
+                // Stats
+                questions_count: 'questions'
+            }
+        };
+
+        // ==================== QUESTION MODEL ====================
+        class Question {
+            constructor({
+                id = null,
+                type = 'single',
+                text = '',
+                explanation = '',
+                options = [],
+                correct = [],
+                pairs = [],
+                category = '',
+                tags = [],
+                imageData = '',
+                difficulty = 1,
+                markedForReview = false
+            } = {}) {
+                this.id = id || this.generateId();
+                this.type = type;
+                this.text = text;
+                this.explanation = explanation;
+                this.options = options;
+                this.correct = correct;
+                this.pairs = pairs.map(p => new PairItem(p));
+                this.category = category;
+                this.tags = tags;
+                this.imageData = imageData;
+                this.difficulty = difficulty;
+                this.markedForReview = markedForReview;
+            }
+
+            // Generate unique ID using timestamp
+            generateId() {
+                return Date.now() + Math.random().toString(36).substr(2, 9);
+            }
+
+            // Check if question is valid
+            get isValid() {
+                if (!this.text || this.text.trim().isEmpty()) return false;
+                if (!this.category || this.category.trim().isEmpty()) return false;
+
+                switch (this.type) {
+                    case 'single':
+                    case 'multiple':
+                    case 'ordering':
+                        return this.options.length >= 2 && this.correct.length > 0;
+                    case 'pairing':
+                        return this.pairs.length > 0;
+                    default:
+                        return false;
+                }
+            }
+
+            // Convert Question to JSON (export format)
+            toJson() {
+                const json = {
+                    id: this.id,
+                    type: this.type,
+                    text: this.text,
+                    category: this.category,
+                    tags: this.tags,
+                    difficulty: this.difficulty
+                };
+
+                if (this.explanation) {
+                    json.explanation = this.explanation;
+                }
+
+                if (this.imageData) {
+                    json.imageData = this.imageData;
+                }
+
+                if (this.markedForReview) {
+                    json.markedForReview = true;
+                }
+
+                // For pairing questions, export pairs
+                if (this.type === 'pairing') {
+                    json.pairs = this.pairs.map(p => p.toJson());
+                    json.options = [];
+                    json.correct = [];
+                } else {
+                    // For single/multiple/ordering, export options and correct
+                    json.options = this.options;
+                    json.correct = this.correct; // 1-based indices
+                }
+
+                return json;
+            }
+
+            // Create Question from JSON (import format)
+            static fromJson(json) {
+                // Parse pairs if present
+                let pairs = [];
+                if (json.pairs && Array.isArray(json.pairs)) {
+                    pairs = json.pairs.map(p => PairItem.fromJson(p));
+                }
+
+                // Parse options
+                const options = json.options || [];
+
+                // Parse correct - can be indices (numbers) or text (strings)
+                const correct = json.correct || [];
+
+                return new Question({
+                    id: json.id,
+                    type: json.type,
+                    text: json.text,
+                    explanation: json.explanation || '',
+                    options: options,
+                    correct: correct,
+                    pairs: pairs,
+                    category: json.category || '',
+                    tags: json.tags || [],
+                    imageData: json.imageData || '',
+                    difficulty: json.difficulty || 1,
+                    markedForReview: json.markedForReview || false
+                });
+            }
+        }
+
+        // ==================== PAIR ITEM MODEL ====================
+        class PairItem {
+            constructor({ left = '', right = '' } = {}) {
+                this.left = left;
+                this.right = right;
+            }
+
+            toJson() {
+                return {
+                    left: this.left,
+                    right: this.right
+                };
+            }
+
+            static fromJson(json) {
+                return new PairItem({
+                    left: json.left || '',
+                    right: json.right || ''
+                });
+            }
+
+            toString() {
+                return `${this.left}::${this.right}`;
+            }
+
+            equals(other) {
+                if (!other) return false;
+                return this.left === other.left && this.right === other.right;
+            }
+        }
+
+        // ==================== HELPER FUNCTIONS ====================
+        const Helpers = {
+            // Generate unique ID
+            generateId() {
+                return Date.now() + Math.random().toString(36).substr(2, 9);
+            },
+
+            // Convert 0-based index to 1-based
+            toOneBased(index) {
+                return index + 1;
+            },
+
+            // Convert 1-based index to 0-based
+            toZeroBased(index) {
+                return index - 1;
+            },
+
+            // Convert all indices in array from 0-based to 1-based
+            convertToOneBased(indices) {
+                return indices.map(i => this.toOneBased(i));
+            },
+
+            // Convert all indices in array from 1-based to 0-based
+            convertToZeroBased(indices) {
+                return indices.map(i => this.toZeroBased(i));
+            },
+
+            // Validate question type
+            isValidQuestionType(type) {
+                return ['single', 'multiple', 'ordering', 'pairing'].includes(type);
+            },
+
+            // Get question type emoji
+            getQuestionTypeEmoji(type) {
+                const emojis = {
+                    'single': '⭕',
+                    'multiple': '☑️',
+                    'ordering': '🔢',
+                    'pairing': '🔗'
+                };
+                return emojis[type] || '❓';
+            },
+
+            // File to base64
+            fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            },
+
+            // Resize image using canvas
+            resizeImage(dataUrl, maxWidth = 1024, maxHeight = 1024, quality = 0.85) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Calculate new dimensions maintaining aspect ratio
+                        if (width > maxWidth || height > maxHeight) {
+                            if (width / maxWidth > height / maxHeight) {
+                                width = maxWidth;
+                                height = (maxWidth / img.width) * img.height;
+                            } else {
+                                height = maxHeight;
+                                width = (maxHeight / img.height) * img.width;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = dataUrl;
+                });
+            },
+
+            // Format date to ISO string
+            formatDate(date) {
+                return new Date(date).toISOString();
+            },
+
+            // Get current timestamp
+            getTimestamp() {
+                return Date.now();
+            },
+
+            // Sanitize HTML (basic)
+            sanitizeHtml(html) {
+                const div = document.createElement('div');
+                div.textContent = html;
+                return div.innerHTML;
+            }
+        };
+
+        // ==================== APP CLASS ====================
+        class QuizEditorApp {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                console.log('Quiz Question Editor v0.3.1 - Initializing...');
+
+                // Load language preference
+                const savedLang = localStorage.getItem('language');
+                if (savedLang && (savedLang === 'pl' || savedLang === 'en')) {
+                    AppState.language = savedLang;
+                    document.getElementById('lang-pl').classList.toggle('active', AppState.language === 'pl');
+                    document.getElementById('lang-en').classList.toggle('active', AppState.language === 'en');
+                }
+
+                this.bindEvents();
+                this.loadQuestions();
+                this.updateAllText();
+            }
+
+            // ==================== EVENT BINDING ====================
+            bindEvents() {
+                // Navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.getAttribute('data-page');
+                        this.navigateTo(page);
+                    });
+                });
+
+                // Buttons
+                document.getElementById('add-question-btn')?.addEventListener('click', () => {
+                    this.navigateTo('create');
+                });
+
+                document.getElementById('cancel-btn')?.addEventListener('click', () => {
+                    this.navigateTo('questions');
+                });
+
+                document.getElementById('save-btn')?.addEventListener('click', () => {
+                    this.showToast('warning', this.t('toast_warning'), this.t('impl_warning') + ' ' + this.t('impl_text'));
+                });
+
+                document.getElementById('export-btn')?.addEventListener('click', () => {
+                    this.showToast('warning', this.t('toast_warning'), this.t('impl_warning') + ' ' + this.t('impl_text'));
+                });
+            }
+
+            // ==================== NAVIGATION ====================
+            navigateTo(pageName) {
+                AppState.currentPage = pageName;
+
+                // Update nav links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-page') === pageName) {
+                        link.classList.add('active');
+                    }
+                });
+
+                // Update pages
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+
+                const targetPage = document.getElementById(`${pageName}-page`);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+
+                console.log(`Navigated to: ${pageName}`);
+            }
+
+            // ==================== QUESTIONS ====================
+            loadQuestions() {
+                const saved = localStorage.getItem('questions');
+                if (saved) {
+                    try {
+                        AppState.questions = JSON.parse(saved);
+                        console.log(`Loaded ${AppState.questions.length} questions`);
+                    } catch (e) {
+                        console.error('Error loading questions:', e);
+                        AppState.questions = [];
+                    }
+                }
+                this.updateUI();
+            }
+
+            saveQuestions() {
+                localStorage.setItem('questions', JSON.stringify(AppState.questions));
+            }
+
+            // ==================== UI UPDATES ====================
+            updateUI() {
+                this.renderStats();
+                this.renderQuestions();
+                this.renderPagination();
+                this.updateEmptyState();
+            }
+
+            // ==================== RENDER STATS ====================
+            renderStats() {
+                const stats = {
+                    single: 0,
+                    multiple: 0,
+                    ordering: 0,
+                    pairing: 0,
+                    total: AppState.questions.length
+                };
+
+                AppState.questions.forEach(q => {
+                    if (stats.hasOwnProperty(q.type)) {
+                        stats[q.type]++;
+                    }
+                });
+
+                document.getElementById('stat-single').textContent = stats.single;
+                document.getElementById('stat-multiple').textContent = stats.multiple;
+                document.getElementById('stat-ordering').textContent = stats.ordering;
+                document.getElementById('stat-pairing').textContent = stats.pairing;
+                document.getElementById('stat-total').textContent = stats.total;
+            }
+
+            // ==================== RENDER QUESTIONS ====================
+            renderQuestions() {
+                const container = document.getElementById('questions-list');
+                if (!container) return;
+
+                // Get questions for current page
+                const start = AppState.currentPageIndex * AppState.itemsPerPage;
+                const end = start + AppState.itemsPerPage;
+                const questions = AppState.questions.slice(start, end);
+
+                container.innerHTML = questions.map(q => this.renderQuestionCard(q)).join('');
+            }
+
+            // ==================== RENDER QUESTION CARD ====================
+            renderQuestionCard(question) {
+                const typeEmoji = Helpers.getQuestionTypeEmoji(question.type);
+                const typeName = this.getQuestionTypeName(question.type);
+                const stars = '★'.repeat(question.difficulty || 1) + '☆'.repeat(5 - (question.difficulty || 1));
+
+                let contentHtml = '';
+
+                // Image thumbnail
+                if (question.imageData) {
+                    contentHtml += `<img src="${question.imageData}" class="question-image" alt="Question image">`;
+                }
+
+                // Question text
+                contentHtml += `<div class="question-text">${question.text}</div>`;
+
+                // Options for single/multiple/ordering
+                if (question.type !== 'pairing' && question.options && question.options.length > 0) {
+                    contentHtml += `<div class="question-options">`;
+                    question.options.forEach((opt, idx) => {
+                        const isCorrect = question.correct && question.correct.includes(idx + 1);
+                        const marker = String.fromCharCode(65 + idx); // A, B, C, D...
+                        contentHtml += `
+                            <div class="question-option ${isCorrect ? 'correct' : ''}">
+                                <span class="question-option-marker">${marker}.</span>
+                                ${opt}
+                            </div>
+                        `;
+                    });
+                    contentHtml += `</div>`;
+                }
+
+                // Pairs for pairing questions
+                if (question.type === 'pairing' && question.pairs && question.pairs.length > 0) {
+                    contentHtml += `<div class="question-pairs">`;
+                    question.pairs.forEach(pair => {
+                        contentHtml += `
+                            <div class="question-pair">
+                                <div class="question-pair-left">${pair.left}</div>
+                                <span class="question-pair-arrow">→</span>
+                                <div class="question-pair-right">${pair.right}</div>
+                            </div>
+                        `;
+                    });
+                    contentHtml += `</div>`;
+                }
+
+                // Tags and category
+                const tagsHtml = question.tags && question.tags.length > 0
+                    ? question.tags.map(tag => `<span class="badge badge-primary">${tag}</span>`).join('')
+                    : '';
+
+                return `
+                    <div class="question-card ${question.type}" data-id="${question.id}">
+                        <div class="question-header">
+                            <div class="question-type">
+                                <span class="icon">${typeEmoji}</span>
+                                <span>${typeName}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-outline btn-icon" onclick="app.editQuestion('${question.id}')" title="${this.t('edit_btn')}">
+                                    ✏️
+                                </button>
+                                <button class="btn btn-outline btn-icon" onclick="app.copyQuestion('${question.id}')" title="${this.t('copy_btn')}">
+                                    📋
+                                </button>
+                                <button class="btn btn-danger btn-icon" onclick="app.deleteQuestion('${question.id}')" title="${this.t('delete_btn')}">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+
+                        ${contentHtml}
+
+                        <div class="question-footer">
+                            <div class="question-meta">
+                                <div class="difficulty-stars" title="${this.t('difficulty_tooltip')}">${stars}</div>
+                                <span class="badge badge-secondary">${question.category || this.t('no_category')}</span>
+                                ${tagsHtml}
+                            </div>
+                            ${question.explanation ? `<div class="question-explanation"><strong>${this.t('explanation_label')}</strong> ${question.explanation}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ==================== RENDER PAGINATION ====================
+            renderPagination() {
+                const t = Translations[AppState.language];
+                const container = document.getElementById('pagination');
+                const controls = document.getElementById('pagination-controls');
+                const info = document.getElementById('pagination-info');
+
+                if (!container || AppState.questions.length === 0) {
+                    container.classList.add('hidden');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+
+                const totalPages = Math.ceil(AppState.questions.length / AppState.itemsPerPage);
+                const start = AppState.currentPageIndex * AppState.itemsPerPage + 1;
+                const end = Math.min(start + AppState.itemsPerPage - 1, AppState.questions.length);
+
+                info.textContent = `${t.showing} ${start}-${end} ${t.of} ${AppState.questions.length} ${t.questions}`;
+
+                // Render page buttons
+                let buttonsHtml = '';
+
+                // Previous button
+                buttonsHtml += `
+                    <button class="pagination-btn" ${AppState.currentPageIndex === 0 ? 'disabled' : ''} onclick="app.prevPage()">
+                        ← ${t.prev_btn}
+                    </button>
+                `;
+
+                // Page numbers
+                for (let i = 0; i < totalPages; i++) {
+                    const isActive = i === AppState.currentPageIndex;
+                    buttonsHtml += `
+                        <button class="pagination-btn ${isActive ? 'active' : ''}" onclick="app.goToPage(${i})">
+                            ${i + 1}
+                        </button>
+                    `;
+                }
+
+                // Next button
+                buttonsHtml += `
+                    <button class="pagination-btn" ${AppState.currentPageIndex >= totalPages - 1 ? 'disabled' : ''} onclick="app.nextPage()">
+                        ${t.next_btn} →
+                    </button>
+                `;
+
+                controls.innerHTML = buttonsHtml;
+            }
+
+            // ==================== UPDATE EMPTY STATE ====================
+            updateEmptyState() {
+                const emptyState = document.getElementById('empty-state');
+                const questionsList = document.getElementById('questions-list');
+                const pagination = document.getElementById('pagination');
+
+                if (AppState.questions.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    questionsList.classList.add('hidden');
+                    pagination.classList.add('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                    questionsList.classList.remove('hidden');
+                }
+            }
+
+            // ==================== PAGINATION ACTIONS ====================
+            goToPage(pageIndex) {
+                AppState.currentPageIndex = pageIndex;
+                this.updateUI();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            nextPage() {
+                const totalPages = Math.ceil(AppState.questions.length / AppState.itemsPerPage);
+                if (AppState.currentPageIndex < totalPages - 1) {
+                    this.goToPage(AppState.currentPageIndex + 1);
+                }
+            }
+
+            prevPage() {
+                if (AppState.currentPageIndex > 0) {
+                    this.goToPage(AppState.currentPageIndex - 1);
+                }
+            }
+
+            // ==================== QUESTION ACTIONS ====================
+            editQuestion(id) {
+                this.showToast('warning', this.t('toast_warning'), this.t('impl_warning') + ' ' + this.t('impl_text'));
+            }
+
+            copyQuestion(id) {
+                const question = AppState.questions.find(q => q.id === id);
+                if (question) {
+                    const newQuestion = Question.fromJson(question.toJson());
+                    newQuestion.id = Helpers.generateId();
+                    newQuestion.text = `${newQuestion.text} (copy)`;
+                    AppState.questions.unshift(newQuestion);
+                    this.saveQuestions();
+                    this.updateUI();
+                    this.showToast('success', this.t('toast_success'), this.t('copy_success'));
+                }
+            }
+
+            deleteQuestion(id) {
+                const t = Translations[AppState.language];
+                if (confirm(t('delete_confirm'))) {
+                    AppState.questions = AppState.questions.filter(q => q.id !== id);
+                    this.saveQuestions();
+                    this.updateUI();
+                    this.showToast('success', t('toast_success'), t('delete_success'));
+                }
+            }
+
+            // ==================== LANGUAGE ====================
+            setLanguage(lang) {
+                AppState.language = lang;
+                localStorage.setItem('language', lang);
+
+                // Update language switcher UI
+                document.getElementById('lang-pl').classList.toggle('active', lang === 'pl');
+                document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+                // Update all UI text
+                this.updateAllText();
+
+                console.log(`Language switched to: ${lang}`);
+            }
+
+            // ==================== UPDATE ALL TEXT ====================
+            updateAllText() {
+                const t = Translations[AppState.language];
+
+                // Update sidebar navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    const page = link.getAttribute('data-page');
+                    const iconSpan = link.querySelector('.nav-icon');
+                    const textSpan = link.lastChild;
+
+                    if (page === 'questions') {
+                        textSpan.textContent = t.nav_questions;
+                    } else if (page === 'create') {
+                        textSpan.textContent = t.nav_create;
+                    } else if (page === 'import-export') {
+                        textSpan.textContent = t.nav_import_export;
+                    } else if (page === 'help') {
+                        textSpan.textContent = t.nav_help;
+                    }
+                });
+
+                // Update questions page
+                document.querySelector('#questions-page .card-title').textContent = t.list_title;
+                document.querySelector('#questions-page #add-question-btn').innerHTML = `<span class="icon">➕</span> ${t.add_question}`;
+                document.querySelector('#empty-state .empty-title').textContent = t.empty_title;
+                document.querySelector('#empty-state p').textContent = t.empty_text;
+                document.querySelector('#empty-state .btn-primary').innerHTML = `<span class="icon">📥</span> ${t.import_btn}`;
+
+                // Update stats labels
+                document.getElementById('stat-single').nextElementSibling.textContent = t.stats_single;
+                document.getElementById('stat-multiple').nextElementSibling.textContent = t.stats_multiple;
+                document.getElementById('stat-ordering').nextElementSibling.textContent = t.stats_ordering;
+                document.getElementById('stat-pairing').nextElementSibling.textContent = t.stats_pairing;
+                document.getElementById('stat-total').nextElementSibling.textContent = t.stats_total;
+
+                // Re-render questions with new language
+                this.renderQuestions();
+
+                // Update pagination text
+                this.renderPagination();
+
+                // Update create page
+                document.querySelector('#create-page .card-title').textContent = t.editor_title;
+                document.querySelector('#create-page #cancel-btn').textContent = t.cancel_btn;
+                document.querySelector('#create-page #save-btn').innerHTML = `<span class="icon">💾</span> ${t.save_btn}`;
+                document.querySelector('#create-page .text-center p').innerHTML = `${t.impl_warning}<br>${t.impl_text}`;
+
+                // Update import/export page
+                document.querySelector('#import-export-page .card-title').textContent = t.nav_import_export;
+                document.querySelector('#import-export-page .form-group:nth-child(1) .form-label').textContent = t.import_title;
+                document.querySelector('#import-export-page .form-group:nth-child(1) p').textContent = t.import_label;
+                document.querySelector('#import-export-page .form-group:nth-child(2) .form-label').textContent = t.export_title;
+                document.querySelector('#import-export-page #export-btn').innerHTML = `<span class="icon">📤</span> ${t.export_btn}`;
+                document.querySelector('#import-export-page .form-group:nth-child(2) p').textContent = t.export_text;
+
+                // Update help page
+                document.querySelector('#help-page .card-title').textContent = t.help_title;
+                const helpP = document.querySelector('#help-page p');
+                helpP.innerHTML = `<strong>${t.app_version}</strong><br>${t.app_desc}`;
+                const typeH3 = document.querySelector('#help-page h3');
+                typeH3.textContent = t.supported_types;
+                const featuresH3 = typeH3.nextElementSibling.nextElementSibling;
+                featuresH3.textContent = t.features_title;
+
+                // Update footer status
+                const statusP = document.querySelector('#help-page .text-secondary.mt-4');
+                statusP.innerHTML = `<strong>${t.status_label}</strong> ${t.status_0_3_1}<br><strong>${t.progress_0_3_1}</strong>`;
+            }
+
+            // ==================== GET TEXT HELPER ====================
+            t(key) {
+                return Translations[AppState.language][key] || key;
+            }
+
+            getQuestionTypeName(type) {
+                const t = Translations[AppState.language];
+                switch (type) {
+                    case 'single':
+                        return t.type_single;
+                    case 'multiple':
+                        return t.type_multiple;
+                    case 'ordering':
+                        return t.type_ordering;
+                    case 'pairing':
+                        return t.type_pairing;
+                    default:
+                        return type;
+                }
+            }
+
+            // ==================== TOAST NOTIFICATIONS ====================
+            showToast(type, title, message) {
+                const container = document.getElementById('toast-container');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+
+                container.appendChild(toast);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.style.animation = 'slideOut 0.3s ease';
+                        setTimeout(() => toast.remove(), 300);
+                    }
+                }, 5000);
+            }
+        }
+
+        // ==================== INITIALIZE APP ====================
+        const app = new QuizEditorApp();
+
+        console.log('Quiz Question Editor v0.3.1 loaded successfully!');
+        console.log('Language:', AppState.language);
+        console.log('Progress: 30% of implementation plan');
+    </script>
+</body>
+</html>
