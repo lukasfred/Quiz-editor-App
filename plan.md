@@ -4,9 +4,9 @@
 
 **Aplikacja:** Quiz Question Editor (HTML/JS)
 **Wersja docelowa:** 1.0
-**Wersja aktualna:** 0.5.0
+**Wersja aktualna:** 0.8.0
 **Data rozpoczęcia:** 2026-01-30
-**Data aktualizacji:** 2026-02-14
+**Data aktualizacji:** 2026-02-15
 **Autor:** OpenCode AI
 
 ## 🎯 Cel
@@ -168,14 +168,14 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 **Cel:** Dodawanie obrazów do pytań
 
 **Zadania:**
-- [ ] Upload przycisk (file input)
-- [ ] Konwersja do base64 (FileReader)
-- [ ] Podgląd obrazu
-- [ ] Usuwanie obrazu
-- [ ] Optymalizacja rozmiaru (max 1024x1024px)
-- [ ] Walidacja rozmiaru (max 1MB)
-- [ ] Walidacja formatu (JPG, PNG, GIF)
-- [ ] Kompresja jakości (85%)
+- [x] Upload przycisk (file input)
+- [x] Konwersja do base64 (FileReader)
+- [x] Podgląd obrazu
+- [x] Usuwanie obrazu
+- [x] Optymalizacja rozmiaru (max 1024x1024px)
+- [x] Walidacja rozmiaru (max 1MB)
+- [x] Walidacja formatu (JPG, PNG, GIF)
+- [x] Kompresja jakości (85%)
 
 **UI:**
 - Sekcja "Image" w formularzu
@@ -194,17 +194,16 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 ---
 
 ### Krok 7: Podgląd na żywo i poprawki (v0.7 - 70%)
-**Cel:** Dodawanie obrazów do pytań
+**Cel:** Podgląd pytania podczas edycji
 
 **Zadania:**
-- [ ] Upload przycisk (file input)
-- [ ] Konwersja do base64 (FileReader)
-- [ ] Podgląd obrazu
-- [ ] Usuwanie obrazu
-- [ ] Optymalizacja rozmiaru (max 1024x1024px)
-- [ ] Walidacja rozmiaru (max 1MB)
-- [ ] Walidacja formatu (JPG, PNG, GIF)
-- [ ] Kompresja jakości (85%)
+- [x] Podgląd pytania podczas edycji
+- [x] Podgląd dla każdego typu (single/multiple/ordering/pairing)
+- [x] Współczesny design podglądu
+- [x] Automatyczne odświeżanie podglądu
+- [x] Poprawki błędów w edytorze
+- [x] Poprawa walidacji
+- [x] Ulepszenia UX
 
 **UI:**
 - Sekcja "Image" w formularzu
@@ -248,14 +247,14 @@ Wersje są oznaczane na podstawie procentu zrealizowanego planu:
 
 **Zadania:**
 - [x] Import JSON (file input) - już zaimplementowane
-- [ ] Walidacja formatu JSON
-- [ ] Walidacja kompatybilności (version check)
-- [ ] Merge lub Replace All
-- [ ] Export JSON (download)
-- [ ] Format v2.11.0 (meta-data)
-- [ ] Kompatybilność wsteczna (starsze formaty)
-- [ ] Export do schowka (clipboard)
-- [ ] Import ze schowka
+- [x] Walidacja formatu JSON
+- [x] Walidacja kompatybilności (version check)
+- [x] Merge lub Replace All
+- [x] Export JSON (download)
+- [x] Format v2.11.0 (meta-data)
+- [x] Kompatybilność wsteczna (starsze formaty)
+- [x] Export do schowka (clipboard)
+- [x] Import ze schowka
 
 **Format export:**
 ```javascript
@@ -390,5 +389,5 @@ Wszystkie zmiany w planie będą odnotowane w `changelog.md`.
 ---
 
 **Data utworzenia:** 2026-01-30
-**Ostatnia aktualizacja:** 2026-02-14
-**Status:** W implementacji (50% zrealizowanego planu)
+**Ostatnia aktualizacja:** 2026-02-15
+**Status:** W implementacji (80% zrealizowanego planu)

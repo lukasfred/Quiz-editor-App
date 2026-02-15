@@ -4,7 +4,36 @@ Jednoplikowa aplikacja HTML/JS do tworzenia i edycji plików pytań quizowych, w
 
 ## 📋 Funkcjonalności
 
-### Wersja v0.5.0 (50% zrealizowanego planu)
+### Wersja v0.8.0 (80% zrealizowanego planu)
+
+✅ **Kompletny Import/Export** - walidacja i obsługa formatów
+- ✅ Walidacja formatu JSON
+- ✅ Walidacja kompatybilności (version check)
+- ✅ Merge lub Replace All
+- ✅ Export JSON (download)
+- ✅ Format v2.11.0 (meta-data)
+- ✅ Kompatybilność wsteczna (starsze formaty)
+- ✅ Export do schowka (clipboard)
+- ✅ Import ze schowka
+
+✅ **Podgląd na żywo** - automatyczne odświeżanie podczas edycji
+- 👁️ Podgląd pytania w czasie rzeczywistym
+- 📋 Obsługa wszystkich typów pytań (single/multiple/ordering/pairing)
+- 🎨 Współczesny design podglądu
+- 🔄 Automatyczne odświeżanie przy każdej zmianie
+- 📱 Responsywny layout (podgląd na górze na mobile)
+- ✨ Pusty stan z informacją
+
+✅ **Obsługa obrazów** - dodawanie i zarządzanie obrazami
+
+✅ **Obsługa obrazów** - dodawanie i zarządzanie obrazami
+- 📷 Upload obrazów z walidacją formatu (JPG, PNG, GIF)
+- 🖼️ Podgląd obrazu w formularzu edycji
+- 🗑️ Usuwanie obrazu
+- 📐 Automatyczna optymalizacja rozmiaru (max 1024x1024px)
+- 💾 Kompresja jakości JPEG (85%)
+- ✅ Walidacja rozmiaru (max 1MB)
+- ℹ️ Wyświetlanie informacji o rozmiarze w KB
 
 ✅ **Edytor pytań** - pełny formularz z walidacją w czasie rzeczywistym
 - ✏️ Tworzenie nowych pytań
@@ -208,18 +237,18 @@ Zobacz też plik `DEBUG_GUIDE.md` szczegółowy przewodnik debugowania.
 
 ## 🗺️ Plan rozwoju
 
-### Zrealizowane (50%):
+### Zrealizowane (80%):
 - ✅ v0.1 - Podstawowa struktura HTML/CSS
-- ✅ v0.2 - Modele danych (Question, PairItem)
+- ✅ v0.2 - Modele danych
 - ✅ v0.3 - Lista pytań, statystyki, paginacja
 - ✅ v0.3.1 - Przełącznik języka (PL/EN) z debugowaniem
 - ✅ v0.4 - Filtrowanie i wyszukiwanie
-- ✅ v0.5 - **Edytor pytań basic**
+- ✅ v0.5 - Edytor pytań basic
+- ✅ v0.6 - Obsługa obrazów
+- ✅ v0.7 - Podgląd na żywo
+- ✅ v0.8 - **Kompletny Import/Export**
 
 ### Planowane:
-- ⏳ v0.6 - Obsługa obrazów (60%)
-- ⏳ v0.7 - Rozszerzona edycja (podgląd na żywo) (70%)
-- ⏳ v0.8 - Kompletny Import/Export (80%)
 - ⏳ v0.9 - Testowanie i poprawki (90%)
 - ⏳ v1.0 - Wersja produkcyjna (100%)
 
@@ -243,7 +272,7 @@ Aplikacja jest częścią projektu QuizApp (Android + Web Editor).
 
 ---
 
-**Wersja aplikacji:** v0.5.0
-**Data:** 2026-02-14
-**Postęp implementacji:** 50%
-**Status:** Edytor pytań basic
+**Wersja aplikacji:** v0.8.0
+**Data:** 2026-02-15
+**Postęp implementacji:** 80%
+**Status:** Kompletny Import/Export

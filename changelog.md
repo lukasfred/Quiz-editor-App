@@ -10,6 +10,101 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.8.0] - 2026-02-15
+
+### Added
+- **Kompletny Import/Export** (80% planu zrealizowanego)
+- ✅ **Walidacja formatu JSON** - weryfikacja poprawności pliku
+- ✅ **Walidacja kompatybilności** - sprawdzenie wersji formatu
+- ✅ **Merge lub Replace All** - dialog wyboru przy imporcie
+- ✅ **Export JSON** - pobieranie pliku z pytaniami
+- ✅ **Format v2.11.0** - meta-data (version, exportDate, category, totalQuestions)
+- ✅ **Kompatybilność wsteczna** - obsługa starszych formatów (v1.0, v2.0, v2.11.0)
+- ✅ **Export do schowka** - kopiowanie JSON do clipboard
+- ✅ **Import ze schowka** - wklejanie JSON z clipboard
+- ✅ **Komunikaty sukcesu/błędu** - szczegółowe informacje o imporcie/eksporcie
+
+### Changed
+- Zaktualizowano AppState.version na '0.8.0'
+- Zaimplementowano pełną obsługę import/export
+- Zaktualizowano metody:
+  - exportQuestions() - eksport do pliku
+  - exportToClipboard() - eksport do schowka
+  - importFromClipboard() - import ze schowka
+  - handleImport() - obsługa importu z walidacją
+  - validateImportData() - walidacja formatu i kompatybilności
+  - mergeQuestions() - łaczenie pytań
+- Dodano przyciski schowka (clipboard) w UI
+- Zaktualizowano tłumaczenia dla import/export
+
+### Technical Details
+- **Lines of Code**: ~200 linii (HTML + JS)
+- **Dependencies**: None (Vanilla JS)
+- **Browser Support**: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
+- **Import Features**:
+  - JSON format validation
+  - Version compatibility check
+  - Question validation
+  - Merge or replace options
+  - Error handling and reporting
+- **Export Features**:
+  - v2.11.0 format with meta-data
+  - File download (Blob API)
+  - Clipboard API
+  - Pretty JSON output
+
+### User Impact
+- Możliwość bezpiecznego importu pytań
+- Walidacja formatu i kompatybilności
+- Merge lub replace przy imporcie
+- Export do pliku lub schowka
+- Szczegółowe komunikaty o błędach
+
+---
+
+## [0.7.0] - 2026-02-15
+
+### Added
+- **Obsługa obrazów** (60% planu zrealizowanego)
+- 📷 **Upload obrazów** - przycisk wyboru pliku z walidacją
+- 🖼️ **Podgląd obrazu** - miniatura w formularzu edycji
+- 🗑️ **Usuwanie obrazu** - przycisk usuwania obrazu
+- 📐 **Optymalizacja rozmiaru** - automatyczne skalowanie do max 1024x1024px
+- 💾 **Kompresja jakości** - kompresja JPEG do 85%
+- ✅ **Walidacja formatu** - akceptowane: JPG, PNG, GIF
+- ✅ **Walidacja rozmiaru** - maksymalny rozmiar 1MB
+- ℹ️ **Informacje o rozmiarze** - wyświetlanie rozmiaru w KB
+
+### Changed
+- Zaktualizowano AppState.version na '0.6.0'
+- Dodano AppState.editingImageData do śledzenia obrazu w edytorze
+- Zaktualizowano resetForm() do czyszczenia obrazu
+- Zaktualizowano loadQuestionToForm() do ładowania obrazu
+- Zaktualizowano saveQuestion() do zapisywania obrazu
+- Dodano nowe metody: uploadImage(), removeImage(), loadImage(), resetImage(), renderImagePreview(), resizeImage()
+
+### Technical Details
+- **Lines of Code**: ~150 linii (HTML sekcja obrazu + CSS + JS)
+- **Dependencies**: None (Vanilla JS)
+- **Browser Support**: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
+- **Image Processing**:
+  - FileReader API do odczytu plików
+  - Canvas API do resize
+  - Data URL format (base64)
+  - JPEG compression quality: 0.85
+  - Max dimensions: 1024x1024px
+  - Max file size: 1MB (before processing)
+
+### User Impact
+- Możliwość dodawania obrazów do pytań
+- Automatyczna optymalizacja rozmiaru i jakości
+- Podgląd obrazu w czasie rzeczywistym
+- Łatwe usuwanie obrazu
+- Walidacja formatu i rozmiaru przed uploadem
+- Wyświetlanie informacji o rozmiarze obrazu
+
+---
+
 ## [0.5.0] - 2026-02-14
 
 ### Added

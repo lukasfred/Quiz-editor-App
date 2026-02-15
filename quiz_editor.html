@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Quiz Question Editor - Create and edit quiz questions compatible with Android app v2.11.2+">
-    <title>Quiz Question Editor v0.5.0</title>
+    <title>Quiz Question Editor v0.8.0</title>
 
     <style>
         /* ==================== CSS VARIABLES ==================== */
@@ -1051,6 +1051,310 @@
         .pair-remove:hover {
             background-color: rgba(244, 67, 54, 0.8);
         }
+
+        .image-upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .image-upload-container {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .image-preview {
+            width: 200px;
+            height: 200px;
+            border-radius: var(--radius-md);
+            border: 2px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--background-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .image-preview-placeholder {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .image-preview-placeholder span {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .image-upload-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .image-upload-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .image-upload-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .image-upload-input {
+            display: none;
+        }
+
+        .image-remove-btn {
+            display: none;
+            padding: 0.5rem 1rem;
+            background-color: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .image-remove-btn:hover {
+            background-color: rgba(244, 67, 54, 0.8);
+        }
+
+        .image-remove-btn.visible {
+            display: inline-block;
+        }
+
+        .image-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .image-error {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .editor-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .preview-section {
+            position: sticky;
+            top: 2rem;
+            background-color: var(--background-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .preview-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .preview-card {
+            background-color: var(--surface-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .preview-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: var(--background-color);
+            border-radius: var(--radius-sm);
+        }
+
+        .preview-question-text {
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .preview-image.visible {
+            display: block;
+        }
+
+        .preview-options {
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-option {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .preview-option:last-child {
+            border-bottom: none;
+        }
+
+        .preview-option-marker {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .preview-option.single.correct .preview-option-marker,
+        .preview-option.multiple.correct .preview-option-marker {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .preview-option.correct {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .preview-pairs {
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-pair {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .preview-pair:last-child {
+            border-bottom: none;
+        }
+
+        .preview-pair-left,
+        .preview-pair-right {
+            padding: 0.5rem;
+            background-color: var(--surface-color);
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+
+        .preview-pair-arrow {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+        }
+
+        .preview-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .preview-badge.category {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .preview-badge.tag {
+            background-color: var(--background-color);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-explanation {
+            background-color: #FFF3CD;
+            border-left: 4px solid #FFC107;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            margin-top: 1rem;
+        }
+
+        .preview-explanation strong {
+            color: #856404;
+        }
+
+        .preview-empty {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 2rem;
+        }
+
+        .preview-empty span {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 1200px) {
+            .editor-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-section {
+                position: static;
+                order: -1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1069,7 +1373,7 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1 class="sidebar-title">Quiz Editor</h1>
-                    <span class="sidebar-version">v0.5</span>
+                    <span class="sidebar-version">v0.8</span>
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -1153,10 +1457,10 @@
                     </div>
                     <!-- Filters -->
                     <div class="filters-toolbar">
-                        <div class="filter-group">
-                            <label class="filter-label">🔍 Szukaj</label>
-                            <input type="text" class="form-control filter-search" id="filter-search" placeholder="${t('search_placeholder')}">
-                        </div>
+                         <div class="filter-group">
+                             <label class="filter-label">🔍 Szukaj</label>
+                             <input type="text" class="form-control filter-search" id="filter-search" placeholder="Szukaj...">
+                         </div>
                         <div class="filter-group">
                             <label class="filter-label">📋 Typ</label>
                             <select class="form-control" id="filter-type" onchange="app.onFilterTypeChange()">
@@ -1214,99 +1518,140 @@
 
             <!-- Create Page -->
             <section id="create-page" class="page">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title" id="editor-title">Edytor pytań</h2>
-                        <div class="flex gap-2">
-                            <button class="btn btn-outline btn-sm" id="cancel-btn" onclick="app.closeEditor()">
-                                Anuluj
-                            </button>
-                            <button class="btn btn-outline btn-sm" id="save-new-btn" onclick="app.saveQuestion(true)">
-                                <span class="icon">➕</span>
-                                Zapisz i nowy
-                            </button>
-                            <button class="btn btn-primary btn-sm" id="save-btn" onclick="app.saveQuestion(false)">
-                                <span class="icon">💾</span>
-                                Zapisz
-                            </button>
+                <div class="editor-layout">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title" id="editor-title">Edytor pytań</h2>
+                            <div class="flex gap-2">
+                                <button class="btn btn-outline btn-sm" id="cancel-btn" onclick="app.closeEditor()">
+                                    Anuluj
+                                </button>
+                                <button class="btn btn-outline btn-sm" id="save-new-btn" onclick="app.saveQuestion(true)">
+                                    <span class="icon">➕</span>
+                                    Zapisz i nowy
+                                </button>
+                                <button class="btn btn-primary btn-sm" id="save-btn" onclick="app.saveQuestion(false)">
+                                    <span class="icon">💾</span>
+                                    Zapisz
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form id="question-form" class="editor-form">
+                                <input type="hidden" id="question-id" value="">
+
+                                <div class="form-group">
+                                    <label class="form-label" for="question-type">Typ pytania</label>
+                                    <select class="form-control" id="question-type" onchange="app.onQuestionTypeChange()">
+                                        <option value="single">Single Choice (jedna poprawna)</option>
+                                        <option value="multiple">Multiple Choice (wiele poprawnych)</option>
+                                        <option value="ordering">Ordering (kolejność)</option>
+                                        <option value="pairing">Pairing (łączenie par)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="question-text">Treść pytania <span class="required">*</span></label>
+                                    <textarea class="form-control" id="question-text" rows="3" placeholder="Wprowadź treść pytania..." oninput="app.updatePreview()"></textarea>
+                                    <div class="error-message" id="error-question-text"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="question-category">Kategoria <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="question-category" placeholder="np. Matematyka, Historia..." oninput="app.updatePreview()">
+                                    <div class="error-message" id="error-question-category"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="question-tags">Tagi</label>
+                                    <input type="text" class="form-control" id="question-tags-input" placeholder="Wprowadź tag i naciśnij Enter">
+                                    <div class="tags-container" id="question-tags-container">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="question-difficulty">Poziom trudności</label>
+                                    <div class="difficulty-selector" id="difficulty-selector">
+                                        <button type="button" class="difficulty-btn" data-value="1">★</button>
+                                        <button type="button" class="difficulty-btn" data-value="2">★★</button>
+                                        <button type="button" class="difficulty-btn" data-value="3">★★★</button>
+                                        <button type="button" class="difficulty-btn" data-value="4">★★★★</button>
+                                        <button type="button" class="difficulty-btn" data-value="5">★★★★★</button>
+                                    </div>
+                                    <input type="hidden" id="question-difficulty" value="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="question-explanation">Wyjaśnienie (opcjonalne)</label>
+                                    <textarea class="form-control" id="question-explanation" rows="2" placeholder="Wprowadź wyjaśnienie..." oninput="app.updatePreview()"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Obraz (opcjonalne)</label>
+                                    <div class="image-upload-section">
+                                        <div class="image-upload-container">
+                                            <div class="image-preview" id="image-preview">
+                                                <div class="image-preview-placeholder" id="image-preview-placeholder">
+                                                    <span>📷</span>
+                                                    Brak obrazu
+                                                </div>
+                                                <img id="image-preview-img" src="" alt="Podgląd obrazu" style="display: none;">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <label class="image-upload-btn" for="image-upload-input">
+                                                    📤 Wybierz obraz
+                                                </label>
+                                                <input type="file" class="image-upload-input" id="image-upload-input" accept="image/jpeg,image/png,image/gif" onchange="app.uploadImage(this)">
+                                                <button type="button" class="image-remove-btn" id="image-remove-btn" onclick="app.removeImage()">
+                                                    🗑️ Usuń obraz
+                                                </button>
+                                                <div class="image-info" id="image-info">
+                                                    Akceptowane formaty: JPG, PNG, GIF. Maksymalny rozmiar: 1MB.
+                                                </div>
+                                                <div class="image-error" id="image-error"></div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="question-image" value="">
+                                    </div>
+                                </div>
+
+                                <hr class="form-divider">
+
+                                <div id="options-section">
+                                    <div class="form-group">
+                                        <label class="form-label">Opcje odpowiedzi</label>
+                                        <div id="options-container">
+                                        </div>
+                                        <button type="button" class="btn btn-outline btn-sm mt-2" id="add-option-btn" onclick="app.addOption()">
+                                            <span class="icon">➕</span> Dodaj opcję
+                                        </button>
+                                        <div class="error-message" id="error-options"></div>
+                                    </div>
+                                </div>
+
+                                <div id="pairs-section" style="display: none;">
+                                    <div class="form-group">
+                                        <label class="form-label">Pary (dla typu Pairing)</label>
+                                        <div id="pairs-container">
+                                        </div>
+                                        <button type="button" class="btn btn-outline btn-sm mt-2" id="add-pair-btn" onclick="app.addPair()">
+                                            <span class="icon">➕</span> Dodaj parę
+                                        </button>
+                                        <div class="error-message" id="error-pairs"></div>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <form id="question-form" class="editor-form">
-                            <input type="hidden" id="question-id" value="">
-                            
-                            <div class="form-group">
-                                <label class="form-label" for="question-type">Typ pytania</label>
-                                <select class="form-control" id="question-type" onchange="app.onQuestionTypeChange()">
-                                    <option value="single">Single Choice (jedna poprawna)</option>
-                                    <option value="multiple">Multiple Choice (wiele poprawnych)</option>
-                                    <option value="ordering">Ordering (kolejność)</option>
-                                    <option value="pairing">Pairing (łączenie par)</option>
-                                </select>
-                            </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="question-text">Treść pytania <span class="required">*</span></label>
-                                <textarea class="form-control" id="question-text" rows="3" placeholder="Wprowadź treść pytania..."></textarea>
-                                <div class="error-message" id="error-question-text"></div>
+                    <div class="preview-section">
+                        <div class="preview-header">Podgląd pytania</div>
+                        <div id="preview-content">
+                            <div class="preview-empty">
+                                <span>👁️</span>
+                                Wypełnij formularz, aby zobaczyć podgląd
                             </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="question-category">Kategoria <span class="required">*</span></label>
-                                <input type="text" class="form-control" id="question-category" placeholder="np. Matematyka, Historia...">
-                                <div class="error-message" id="error-question-category"></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="question-tags">Tagi</label>
-                                <input type="text" class="form-control" id="question-tags-input" placeholder="Wprowadź tag i naciśnij Enter">
-                                <div class="tags-container" id="question-tags-container">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="question-difficulty">Poziom trudności</label>
-                                <div class="difficulty-selector" id="difficulty-selector">
-                                    <button type="button" class="difficulty-btn" data-value="1">★</button>
-                                    <button type="button" class="difficulty-btn" data-value="2">★★</button>
-                                    <button type="button" class="difficulty-btn" data-value="3">★★★</button>
-                                    <button type="button" class="difficulty-btn" data-value="4">★★★★</button>
-                                    <button type="button" class="difficulty-btn" data-value="5">★★★★★</button>
-                                </div>
-                                <input type="hidden" id="question-difficulty" value="1">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="question-explanation">Wyjaśnienie (opcjonalne)</label>
-                                <textarea class="form-control" id="question-explanation" rows="2" placeholder="Wprowadź wyjaśnienie..."></textarea>
-                            </div>
-
-                            <hr class="form-divider">
-
-                            <div id="options-section">
-                                <div class="form-group">
-                                    <label class="form-label">Opcje odpowiedzi</label>
-                                    <div id="options-container">
-                                    </div>
-                                    <button type="button" class="btn btn-outline btn-sm mt-2" id="add-option-btn" onclick="app.addOption()">
-                                        <span class="icon">➕</span> Dodaj opcję
-                                    </button>
-                                    <div class="error-message" id="error-options"></div>
-                                </div>
-                            </div>
-
-                            <div id="pairs-section" style="display: none;">
-                                <div class="form-group">
-                                    <label class="form-label">Pary (dla typu Pairing)</label>
-                                    <div id="pairs-container">
-                                    </div>
-                                    <button type="button" class="btn btn-outline btn-sm mt-2" id="add-pair-btn" onclick="app.addPair()">
-                                        <span class="icon">➕</span> Dodaj parę
-                                    </button>
-                                    <div class="error-message" id="error-pairs"></div>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1318,17 +1663,30 @@
                         <h2 class="card-title">Import/Export</h2>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Import pytań</label>
+                        <label class="form-label" id="import-label">Import pytań</label>
                         <input type="file" class="form-control" id="import-file" accept=".json">
-                        <p class="text-secondary mt-4">Wybierz plik JSON z pytaniami do zaimportowania.</p>
+                        <p class="text-secondary mt-4" id="import-description">Wybierz plik JSON z pytaniami do zaimportowania.</p>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Eksport pytań</label>
+                        <label class="form-label" id="export-label">Eksport pytań</label>
                         <button class="btn btn-primary" id="export-btn">
                             <span class="icon">📤</span>
                             Eksportuj do pliku
                         </button>
-                        <p class="text-secondary mt-4">Eksportuje wszystkie pytania do formatu JSON v2.11.0.</p>
+                        <p class="text-secondary mt-4" id="export-description">Eksportuje wszystkie pytania do formatu JSON v2.11.0.</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Schowek (Clipboard)</label>
+                        <div class="flex gap-2">
+                            <button class="btn btn-outline" onclick="app.exportToClipboard()">
+                                <span class="icon">📋</span>
+                                Kopiuj do schowka
+                            </button>
+                            <button class="btn btn-outline" onclick="app.importFromClipboard()">
+                                <span class="icon">📋</span>
+                                Wklej ze schowka
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1339,7 +1697,7 @@
                     <div class="card-header">
                         <h2 class="card-title">Pomoc</h2>
                     </div>
-                    <h3>Quiz Question Editor v0.5.0</h3>
+                    <h3>Quiz Question Editor v0.8.0</h3>
                     <p>
                         Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.
                     </p>
@@ -1380,12 +1738,13 @@
         const AppState = {
             currentPage: 'questions',
             questions: [],
-            version: '0.5.0',
+            version: '0.8.0',
             currentPageIndex: 0,
             itemsPerPage: 50,
             language: 'pl',
             // Editor state
             editingQuestionId: null,
+            editingImageData: null,
             // Filters
             filterSearch: '',
             filterType: 'all',
@@ -1443,8 +1802,14 @@
                 impl_text: 'Edytor pytań jest w trakcie implementacji.',
                 status_0_5_0: 'Wersja 0.5.0 - edytor pytań basic',
                 progress_0_5_0: 'Postęp: 50% zrealizowanego planu',
-                
-                // Editor form
+                status_0_6_0: 'Wersja 0.6.0 - obsługa obrazów',
+                progress_0_6_0: 'Postęp: 60% zrealizowanego planu',
+                status_0_7_0: 'Wersja 0.7.0 - podgląd na żywo',
+                 progress_0_7_0: 'Postęp: 70% zrealizowanego planu',
+                 status_0_8_0: 'Wersja 0.8.0 - kompletny Import/Export',
+                 progress_0_8_0: 'Postęp: 80% zrealizowanego planu',
+                 
+                 // Editor form
                 label_type: 'Typ pytania',
                 label_text: 'Treść pytania',
                 placeholder_text: 'Wprowadź treść pytania...',
@@ -1474,17 +1839,28 @@
                 question_saved: 'Pytanie zostało zapisane',
                 question_updated: 'Pytanie zostało zaktualizowane',
 
-                // Import/Export
-                import_title: 'Import pytań',
-                import_label: 'Wybierz plik JSON z pytaniami do zaimportowania.',
-                export_title: 'Eksport pytań',
-                export_btn: 'Eksportuj do pliku',
-                export_text: 'Eksportuje wszystkie pytania do formatu JSON v2.11.0.',
-
-                // Help page
-                help_title: 'Pomoc',
-                app_version: 'Quiz Question Editor v0.5.0',
-                app_desc: 'Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.',
+                 // Import/Export
+                 import_title: 'Import pytań',
+                 import_label: 'Wybierz plik JSON z pytaniami do zaimportowania.',
+                 export_title: 'Eksport pytań',
+                 export_btn: 'Eksportuj do pliku',
+                 export_text: 'Eksportuje wszystkie pytania do formatu JSON v2.11.0.',
+                 export_success: 'Pytania zostały wyeksportowane!',
+                 import_success: 'Zaimportowano {count} pytań!',
+                 import_merge_confirm: 'Znaleziono {count} pytań do zaimportowania. Czy chcesz dołączyć je do istniejących (Merge) czy zamienić (Replace)?',
+                 import_merge_success: 'Zaimportowano {count} pytań (merge)!',
+                 import_cancelled: 'Import został anulowany.',
+                 import_error_invalid: 'Nieprawidłowy format pliku JSON.',
+                 import_error_no_questions: 'Nie znaleziono pytań w pliku.',
+                 import_error_no_valid: 'Nie znaleziono prawidłowych pytań w pliku.',
+                 clipboard_copy_success: 'Skopiowano do schowka!',
+                 clipboard_copy_failed: 'Nie udało się skopiować do schowka.',
+                 clipboard_read_failed: 'Nie udało się odczytać ze schowka.',
+                 
+                 // Help page
+                 help_title: 'Pomoc',
+                 app_version: 'Quiz Question Editor v0.8.0',
+                 app_desc: 'Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.',
                 supported_types: 'Obsługiwane typy pytań:',
                 type_single_desc: 'jedna poprawna odpowiedź',
                 type_multiple_desc: 'wiele poprawnych odpowiedzi',
@@ -1559,8 +1935,14 @@
                 impl_text: 'Question editor is under development.',
                 status_0_5_0: 'Version 0.5.0 - Question editor basic',
                 progress_0_5_0: 'Progress: 50% of implementation plan',
-                
-                // Editor form
+                status_0_6_0: 'Version 0.6.0 - Image support',
+                progress_0_6_0: 'Progress: 60% of implementation plan',
+                status_0_7_0: 'Version 0.7.0 - Live preview',
+                 progress_0_7_0: 'Progress: 70% of implementation plan',
+                 status_0_8_0: 'Version 0.8.0 - Complete Import/Export',
+                 progress_0_8_0: 'Progress: 80% of implementation plan',
+                 
+                 // Editor form
                 label_type: 'Question type',
                 label_text: 'Question text',
                 placeholder_text: 'Enter question text...',
@@ -1590,17 +1972,28 @@
                 question_saved: 'Question saved successfully',
                 question_updated: 'Question updated successfully',
 
-                // Import/Export
-                import_title: 'Import Questions',
-                import_label: 'Select JSON file with questions to import.',
-                export_title: 'Export Questions',
-                export_btn: 'Export to file',
-                export_text: 'Exports all questions to JSON v2.11.0 format.',
-
-                // Help page
-                help_title: 'Help',
-                app_version: 'Quiz Question Editor v0.5.0',
-                app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
+                 // Import/Export
+                 import_title: 'Import Questions',
+                 import_label: 'Select JSON file with questions to import.',
+                 export_title: 'Export Questions',
+                 export_btn: 'Export to file',
+                 export_text: 'Exports all questions to JSON v2.11.0 format.',
+                 export_success: 'Questions exported successfully!',
+                 import_success: 'Imported {count} questions!',
+                 import_merge_confirm: 'Found {count} questions to import. Do you want to merge with existing (Merge) or replace all (Replace)?',
+                 import_merge_success: 'Imported {count} questions (merge)!',
+                 import_cancelled: 'Import was cancelled.',
+                 import_error_invalid: 'Invalid JSON file format.',
+                 import_error_no_questions: 'No questions found in file.',
+                 import_error_no_valid: 'No valid questions found in file.',
+                 clipboard_copy_success: 'Copied to clipboard!',
+                 clipboard_copy_failed: 'Failed to copy to clipboard.',
+                 clipboard_read_failed: 'Failed to read from clipboard.',
+                 
+                 // Help page
+                 help_title: 'Help',
+                 app_version: 'Quiz Question Editor v0.8.0',
+                 app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
                 supported_types: 'Supported question types:',
                 type_single_desc: 'one correct answer',
                 type_multiple_desc: 'multiple correct answers',
@@ -1888,7 +2281,7 @@
             }
 
             init() {
-                console.log('Quiz Question Editor v0.5.0 - Initializing...');
+                console.log('Quiz Question Editor v0.8.0 - Initializing...');
 
                 // Load language preference
                 const savedLang = localStorage.getItem('language');
@@ -1929,7 +2322,7 @@
 
                 // Export button
                 document.getElementById('export-btn')?.addEventListener('click', () => {
-                    this.showToast('warning', this.t('toast_warning'), this.t('impl_warning') + ' ' + this.t('impl_text'));
+                    this.exportQuestions();
                 });
 
                 // Difficulty selector
@@ -1956,12 +2349,7 @@
                         reader.onload = (event) => {
                             try {
                                 const data = JSON.parse(event.target.result);
-                                if (data.questions && Array.isArray(data.questions)) {
-                                    AppState.questions = data.questions.map(q => Question.fromJson(q));
-                                    this.saveQuestions();
-                                    this.updateUI();
-                                    this.showToast('success', this.t('toast_success'), 'Import successful!');
-                                }
+                                this.handleImport(data);
                             } catch (error) {
                                 this.showToast('error', this.t('toast_error'), 'Import failed: ' + error.message);
                             }
@@ -1997,6 +2385,23 @@
             }
 
             // ==================== QUESTIONS ====================
+            getFilteredQuestions() {
+                return AppState.questions.filter(q => {
+                    const matchesSearch = AppState.filterSearch === '' || 
+                        q.text.toLowerCase().includes(AppState.filterSearch.toLowerCase()) ||
+                        q.category.toLowerCase().includes(AppState.filterSearch.toLowerCase());
+
+                    const matchesType = AppState.filterType === 'all' || q.type === AppState.filterType;
+
+                    const matchesCategory = AppState.filterCategory === '' || q.category === AppState.filterCategory;
+
+                    const matchesTags = AppState.filterTags.length === 0 || 
+                        (q.tags && q.tags.some(tag => AppState.filterTags.includes(tag)));
+
+                    return matchesSearch && matchesType && matchesCategory && matchesTags;
+                });
+            }
+
             loadQuestions() {
                 const saved = localStorage.getItem('questions');
                 if (saved) {
@@ -2041,7 +2446,7 @@
                 // Update search input
                 const searchInput = document.getElementById('filter-search');
                 if (searchInput) {
-                    searchInput.placeholder = t('search_placeholder');
+                    searchInput.placeholder = t.search_placeholder;
                 }
 
                 // Update type dropdown
@@ -2058,12 +2463,12 @@
                     const currentValue = AppState.filterCategory;
 
                     // Clear existing options
-                    categoryFilter.innerHTML = `<option value="">${t('filter_category_all')}</option>`;
+                    categoryFilter.innerHTML = `<option value="">${t.filter_category_all}</option>`;
 
                     // Add "All" option
                     const allOption = document.createElement('option');
                     allOption.value = '';
-                    allOption.textContent = t('filter_category_all');
+                    allOption.textContent = t.filter_category_all;
                     categoryFilter.appendChild(allOption);
 
                     // Add category options
@@ -2115,10 +2520,12 @@
                 const container = document.getElementById('questions-list');
                 if (!container) return;
 
+                const filteredQuestions = this.getFilteredQuestions();
+
                 // Get questions for current page
                 const start = AppState.currentPageIndex * AppState.itemsPerPage;
                 const end = start + AppState.itemsPerPage;
-                const questions = AppState.questions.slice(start, end);
+                const questions = filteredQuestions.slice(start, end);
 
                 container.innerHTML = questions.map(q => this.renderQuestionCard(q)).join('');
             }
@@ -2139,8 +2546,21 @@
                 // Question text
                 contentHtml += `<div class="question-text">${question.text}</div>`;
 
-                // Options for single/multiple/ordering
-                if (question.type !== 'pairing' && question.options && question.options.length > 0) {
+                // Options for ordering
+                if (question.type === 'ordering' && question.options && question.options.length > 0) {
+                    contentHtml += `<div class="question-options">`;
+                    question.options.forEach((opt, idx) => {
+                        contentHtml += `
+                            <div class="question-option">
+                                <span class="question-option-marker">${idx + 1}.</span>
+                                ${opt}
+                            </div>
+                        `;
+                    });
+                    contentHtml += `</div>`;
+                }
+                // Options for single/multiple
+                else if (question.type !== 'pairing' && question.options && question.options.length > 0) {
                     contentHtml += `<div class="question-options">`;
                     question.options.forEach((opt, idx) => {
                         const isCorrect = question.correct && question.correct.includes(idx + 1);
@@ -2216,18 +2636,22 @@
                 const controls = document.getElementById('pagination-controls');
                 const info = document.getElementById('pagination-info');
 
-                if (!container || AppState.questions.length === 0) {
+                if (!container) return;
+
+                const filteredQuestions = this.getFilteredQuestions();
+
+                if (filteredQuestions.length === 0) {
                     container.classList.add('hidden');
                     return;
                 }
 
                 container.classList.remove('hidden');
 
-                const totalPages = Math.ceil(AppState.questions.length / AppState.itemsPerPage);
+                const totalPages = Math.ceil(filteredQuestions.length / AppState.itemsPerPage);
                 const start = AppState.currentPageIndex * AppState.itemsPerPage + 1;
-                const end = Math.min(start + AppState.itemsPerPage - 1, AppState.questions.length);
+                const end = Math.min(start + AppState.itemsPerPage - 1, filteredQuestions.length);
 
-                info.textContent = `${t.showing} ${start}-${end} ${t.of} ${AppState.questions.length} ${t.questions}`;
+                info.textContent = `${t.showing} ${start}-${end} ${t.of} ${filteredQuestions.length} ${t.questions}`;
 
                 // Render page buttons
                 let buttonsHtml = '';
@@ -2310,11 +2734,11 @@
 
                 if (isNew) {
                     AppState.editingQuestionId = null;
-                    document.getElementById('editor-title').textContent = t('editor_title_new');
+                    document.getElementById('editor-title').textContent = t.editor_title_new;
                     this.resetForm();
                 } else {
                     AppState.editingQuestionId = id;
-                    document.getElementById('editor-title').textContent = t('editor_title_edit');
+                    document.getElementById('editor-title').textContent = t.editor_title_edit;
                     this.loadQuestionToForm(id);
                 }
             }
@@ -2339,6 +2763,8 @@
                 this.clearErrors();
                 this.setDifficulty(1);
                 this.renderOptionsEditor();
+                this.resetImage();
+                this.updatePreview();
             }
 
             clearErrors() {
@@ -2362,6 +2788,8 @@
                 this.setDifficulty(question.difficulty || 1);
                 this.renderTags(question.tags || []);
                 this.renderOptionsEditor(question);
+                this.loadImage(question.imageData || null);
+                this.updatePreview();
             }
 
             setDifficulty(value) {
@@ -2388,6 +2816,7 @@
 
             onQuestionTypeChange() {
                 this.renderOptionsEditor();
+                this.updatePreview();
             }
 
             renderOptionsEditor(question = null) {
@@ -2421,17 +2850,6 @@
                     const optionDiv = document.createElement('div');
                     optionDiv.className = 'option-item';
 
-                    let inputType = 'radio';
-                    if (type === 'multiple') {
-                        inputType = 'checkbox';
-                    }
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = inputType;
-                    checkbox.className = 'option-checkbox';
-                    checkbox.checked = isCorrect;
-                    checkbox.onchange = () => this.toggleCorrect(index);
-
                     const textInput = document.createElement('input');
                     textInput.type = 'text';
                     textInput.className = 'form-control option-text';
@@ -2457,7 +2875,15 @@
                     moveDownBtn.textContent = '↓';
                     moveDownBtn.onclick = () => this.moveOption(index, 1);
 
-                    optionDiv.appendChild(checkbox);
+                    if (type !== 'ordering') {
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'option-checkbox';
+                        checkbox.checked = isCorrect;
+                        checkbox.onchange = () => this.toggleCorrect(index);
+                        optionDiv.appendChild(checkbox);
+                    }
+
                     optionDiv.appendChild(textInput);
 
                     if (type === 'ordering') {
@@ -2522,6 +2948,7 @@
                     this.getCorrectFromForm(),
                     document.getElementById('question-type').value
                 );
+                this.updatePreview();
             }
 
             removeOption(index) {
@@ -2534,6 +2961,7 @@
                 const newCorrect = correct.filter(c => c !== index + 1).map(c => c > index + 1 ? c - 1 : c);
 
                 this.renderOptionsList(optionsValues, newCorrect, document.getElementById('question-type').value);
+                this.updatePreview();
             }
 
             moveOption(index, direction) {
@@ -2549,12 +2977,27 @@
                 optionsValues[newIndex] = temp;
 
                 this.renderOptionsList(optionsValues, this.getCorrectFromForm(), document.getElementById('question-type').value);
+                this.updatePreview();
             }
 
             updateOption(index, value) {
+                this.updatePreview();
             }
 
             toggleCorrect(index) {
+                const type = document.getElementById('question-type').value;
+                const checkboxes = document.querySelectorAll('.option-checkbox');
+                const checkbox = checkboxes[index];
+
+                if (type === 'single' && checkbox.checked) {
+                    checkboxes.forEach((cb, idx) => {
+                        if (idx !== index) {
+                            cb.checked = false;
+                        }
+                    });
+                }
+
+                this.updatePreview();
             }
 
             getCorrectFromForm() {
@@ -2587,6 +3030,7 @@
                 pairsData.push({ left: '', right: '' });
                 container.innerHTML = '';
                 pairsData.forEach((pair, index) => this.renderPairItem(index, pair));
+                this.updatePreview();
             }
 
             removePair(index) {
@@ -2605,17 +3049,20 @@
                 pairsData.splice(index, 1);
                 container.innerHTML = '';
                 pairsData.forEach((pair, i) => this.renderPairItem(i, pair));
+                this.updatePreview();
             }
 
             updatePairLeft(index, value) {
+                this.updatePreview();
             }
 
             updatePairRight(index, value) {
+                this.updatePreview();
             }
 
             addTag(tag) {
                 const container = document.getElementById('question-tags-container');
-                const tags = Array.from(container.querySelectorAll('.tag-chip')).map(chip => 
+                const tags = Array.from(container.querySelectorAll('.tag-chip')).map(chip =>
                     chip.textContent.replace('×', '').trim()
                 );
 
@@ -2627,6 +3074,7 @@
                 }
 
                 document.getElementById('question-tags-input').value = '';
+                this.updatePreview();
             }
 
             removeTag(tag) {
@@ -2636,6 +3084,246 @@
                     if (chip.textContent.includes(tag)) {
                         chip.remove();
                     }
+                });
+                this.updatePreview();
+            }
+
+            uploadImage(input) {
+                const file = input.files[0];
+                if (!file) {
+                    return;
+                }
+
+                const errorElement = document.getElementById('image-error');
+                const infoElement = document.getElementById('image-info');
+
+                errorElement.textContent = '';
+
+                const maxSize = 1 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    errorElement.textContent = 'Plik jest za duży. Maksymalny rozmiar to 1MB.';
+                    input.value = '';
+                    return;
+                }
+
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!allowedTypes.includes(file.type)) {
+                    errorElement.textContent = 'Nieobsługiwany format. Dozwolone: JPG, PNG, GIF.';
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const resizedImageData = this.resizeImage(img, 1024, 1024, 0.85);
+                        AppState.editingImageData = resizedImageData;
+                        this.renderImagePreview(resizedImageData);
+                        infoElement.textContent = `Rozmiar: ${Math.round(resizedImageData.length / 1024)}KB`;
+                        input.value = '';
+                        this.updatePreview();
+                    };
+                    img.onerror = () => {
+                        errorElement.textContent = 'Błąd podczas ładowania obrazu.';
+                        input.value = '';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => {
+                    errorElement.textContent = 'Błąd podczas odczytu pliku.';
+                    input.value = '';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            removeImage() {
+                this.resetImage();
+                this.updatePreview();
+            }
+
+            loadImage(imageData) {
+                if (imageData) {
+                    AppState.editingImageData = imageData;
+                    this.renderImagePreview(imageData);
+                    document.getElementById('image-info').textContent = `Rozmiar: ${Math.round(imageData.length / 1024)}KB`;
+                } else {
+                    this.resetImage();
+                }
+                this.updatePreview();
+            }
+
+            resetImage() {
+                AppState.editingImageData = null;
+                document.getElementById('question-image').value = '';
+                document.getElementById('image-upload-input').value = '';
+                document.getElementById('image-info').textContent = 'Akceptowane formaty: JPG, PNG, GIF. Maksymalny rozmiar: 1MB.';
+                document.getElementById('image-error').textContent = '';
+                this.renderImagePreview(null);
+                this.updatePreview();
+            }
+
+            renderImagePreview(imageData) {
+                const previewImg = document.getElementById('image-preview-img');
+                const previewPlaceholder = document.getElementById('image-preview-placeholder');
+                const removeBtn = document.getElementById('image-remove-btn');
+
+                if (imageData) {
+                    previewImg.src = imageData;
+                    previewImg.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    removeBtn.classList.add('visible');
+                } else {
+                    previewImg.style.display = 'none';
+                    previewPlaceholder.style.display = 'block';
+                    removeBtn.classList.remove('visible');
+                }
+            }
+
+            resizeImage(img, maxWidth, maxHeight, quality) {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth || height > maxHeight) {
+                    const ratio = Math.min(maxWidth / width, maxHeight / height);
+                    width = Math.floor(width * ratio);
+                    height = Math.floor(height * ratio);
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                return canvas.toDataURL('image/jpeg', quality);
+            }
+
+            updatePreview() {
+                const previewContent = document.getElementById('preview-content');
+                if (!previewContent) return;
+
+                const type = document.getElementById('question-type').value;
+                const text = document.getElementById('question-text').value.trim();
+                const category = document.getElementById('question-category').value.trim();
+                const difficulty = parseInt(document.getElementById('question-difficulty').value);
+                const explanation = document.getElementById('question-explanation').value.trim();
+                const tagsContainer = document.getElementById('question-tags-container');
+                const tags = Array.from(tagsContainer.querySelectorAll('.tag-chip')).map(chip =>
+                    chip.textContent.replace('×', '').trim()
+                );
+
+                if (!text && !category) {
+                    previewContent.innerHTML = `
+                        <div class="preview-empty">
+                            <span>👁️</span>
+                            Wypełnij formularz, aby zobaczyć podgląd
+                        </div>
+                    `;
+                    return;
+                }
+
+                const typeEmoji = Helpers.getQuestionTypeEmoji(type);
+                const typeName = this.getQuestionTypeName(type);
+                const stars = '★'.repeat(difficulty) + '☆'.repeat(5 - difficulty);
+
+                let contentHtml = '';
+
+                if (AppState.editingImageData) {
+                    contentHtml += `<img src="${AppState.editingImageData}" class="preview-image visible" alt="Podgląd obrazu">`;
+                }
+
+                contentHtml += `<div class="preview-type"><span class="icon">${typeEmoji}</span> ${typeName}</div>`;
+
+                if (text) {
+                    contentHtml += `<div class="preview-question-text">${text}</div>`;
+                }
+
+                if (type === 'ordering') {
+                    const options = this.getOptionsFromForm();
+                    
+                    if (options.length > 0) {
+                        contentHtml += `<div class="preview-options">`;
+                        options.forEach((opt, idx) => {
+                            contentHtml += `
+                                <div class="preview-option">
+                                    <div class="preview-option-marker">${idx + 1}.</div>
+                                    ${opt || '(opcja ' + (idx + 1) + ')'}
+                                </div>
+                            `;
+                        });
+                        contentHtml += `</div>`;
+                    }
+                } else if (type !== 'pairing') {
+                    const options = this.getOptionsFromForm();
+                    const correct = this.getCorrectFromForm();
+                    
+                    if (options.length > 0) {
+                        contentHtml += `<div class="preview-options">`;
+                        options.forEach((opt, idx) => {
+                            const isCorrect = correct.includes(idx + 1);
+                            const marker = String.fromCharCode(65 + idx);
+                            const typeClass = type === 'single' ? 'single' : 'multiple';
+                            contentHtml += `
+                                <div class="preview-option ${typeClass} ${isCorrect ? 'correct' : ''}">
+                                    <div class="preview-option-marker">${marker}</div>
+                                    ${opt || '(opcja ' + (idx + 1) + ')'}
+                                </div>
+                            `;
+                        });
+                        contentHtml += `</div>`;
+                    }
+                } else {
+                    const pairs = this.getPairsFromForm();
+                    
+                    if (pairs.length > 0) {
+                        contentHtml += `<div class="preview-pairs">`;
+                        pairs.forEach((pair, idx) => {
+                            contentHtml += `
+                                <div class="preview-pair">
+                                    <div class="preview-pair-left">${pair.left || '(lewa ' + (idx + 1) + ')'}</div>
+                                    <div class="preview-pair-arrow">→</div>
+                                    <div class="preview-pair-right">${pair.right || '(prawa ' + (idx + 1) + ')'}</div>
+                                </div>
+                            `;
+                        });
+                        contentHtml += `</div>`;
+                    }
+                }
+
+                if (category || tags.length > 0) {
+                    contentHtml += `<div class="preview-meta">`;
+                    if (category) {
+                        contentHtml += `<span class="preview-badge category">${category}</span>`;
+                    }
+                    tags.forEach(tag => {
+                        contentHtml += `<span class="preview-badge tag">#${tag}</span>`;
+                    });
+                    contentHtml += `</div>`;
+                }
+
+                if (explanation) {
+                    contentHtml += `<div class="preview-explanation"><strong>Wyjaśnienie:</strong> ${explanation}</div>`;
+                }
+
+                previewContent.innerHTML = `<div class="preview-card">${contentHtml}</div>`;
+            }
+
+            getOptionsFromForm() {
+                const optionInputs = document.querySelectorAll('.option-text');
+                return Array.from(optionInputs).map(input => input.value.trim());
+            }
+
+            getPairsFromForm() {
+                const pairsContainer = document.getElementById('pairs-container');
+                const pairs = pairsContainer.querySelectorAll('.pair-item');
+                return Array.from(pairs).map(pairDiv => {
+                    const inputs = pairDiv.querySelectorAll('input');
+                    return {
+                        left: inputs[0].value.trim(),
+                        right: inputs[1].value.trim()
+                    };
                 });
             }
 
@@ -2649,19 +3337,19 @@
                 const type = document.getElementById('question-type').value;
 
                 if (!text) {
-                    document.getElementById('error-question-text').textContent = t('error_text_required');
+                    document.getElementById('error-question-text').textContent = t.error_text_required;
                     isValid = false;
                 }
 
                 if (!category) {
-                    document.getElementById('error-question-category').textContent = t('error_category_required');
+                    document.getElementById('error-question-category').textContent = t.error_category_required;
                     isValid = false;
                 }
 
                 if (type === 'pairing') {
                     const pairs = document.getElementById('pairs-container').querySelectorAll('.pair-item');
                     if (pairs.length === 0) {
-                        document.getElementById('error-pairs').textContent = t('error_min_pairs');
+                        document.getElementById('error-pairs').textContent = t.error_min_pairs;
                         isValid = false;
                     }
                 } else {
@@ -2669,12 +3357,12 @@
                     const correct = this.getCorrectFromForm();
 
                     if (options.length < 2) {
-                        document.getElementById('error-options').textContent = t('error_min_options');
+                        document.getElementById('error-options').textContent = t.error_min_options;
                         isValid = false;
                     }
 
-                    if (correct.length === 0) {
-                        document.getElementById('error-options').textContent = t('error_min_correct');
+                    if (correct.length === 0 && type !== 'ordering') {
+                        document.getElementById('error-options').textContent = t.error_min_correct;
                         isValid = false;
                     }
                 }
@@ -2715,7 +3403,12 @@
                 } else {
                     const optionInputs = document.querySelectorAll('.option-text');
                     options = Array.from(optionInputs).map(input => input.value.trim());
-                    correct = this.getCorrectFromForm();
+                    
+                    if (type === 'ordering') {
+                        correct = options.map((_, index) => index + 1);
+                    } else {
+                        correct = this.getCorrectFromForm();
+                    }
                 }
 
                 const t = Translations[AppState.language];
@@ -2733,9 +3426,10 @@
                             tags,
                             options,
                             correct,
-                            pairs
+                            pairs,
+                            imageData: AppState.editingImageData || ''
                         };
-                        this.showToast('success', t('toast_success'), t('question_updated'));
+                        this.showToast('success', t.toast_success, t.question_updated);
                     }
                 } else {
                     const newQuestion = new Question({
@@ -2747,10 +3441,11 @@
                         tags,
                         options,
                         correct,
-                        pairs
+                        pairs,
+                        imageData: AppState.editingImageData || ''
                     });
                     AppState.questions.unshift(newQuestion);
-                    this.showToast('success', t('toast_success'), t('question_saved'));
+                    this.showToast('success', t.toast_success, t.question_saved);
                 }
 
                 this.saveQuestions();
@@ -2766,7 +3461,9 @@
             copyQuestion(id) {
                 const question = AppState.questions.find(q => q.id === id);
                 if (question) {
-                    const newQuestion = Question.fromJson(question.toJson());
+                    const newQuestion = new Question({
+                        ...question
+                    });
                     newQuestion.id = Helpers.generateId();
                     newQuestion.text = `${newQuestion.text} (copy)`;
                     AppState.questions.unshift(newQuestion);
@@ -2778,11 +3475,11 @@
 
             deleteQuestion(id) {
                 const t = Translations[AppState.language];
-                if (confirm(t('delete_confirm'))) {
+                if (confirm(t.delete_confirm)) {
                     AppState.questions = AppState.questions.filter(q => q.id !== id);
                     this.saveQuestions();
                     this.updateUI();
-                    this.showToast('success', t('toast_success'), t('delete_success'));
+                    this.showToast('success', t.toast_success, t.delete_success);
                 }
             }
 
@@ -2873,7 +3570,7 @@
                 // Update create page
                 const editorTitle = safeGetElement('#editor-title');
                 if (editorTitle) {
-                    safeSetText(editorTitle, AppState.editingQuestionId ? t('editor_title_edit') : t('editor_title_new'));
+                    safeSetText(editorTitle, AppState.editingQuestionId ? t.editor_title_edit : t.editor_title_new);
                 }
                 safeSetText(safeGetElement('#cancel-btn'), t.cancel_btn);
                 safeSetHTML(safeGetElement('#save-btn'), `<span class="icon">💾</span> ${t.save_btn}`);
@@ -2910,17 +3607,17 @@
 
                 // Update import/export page
                 safeSetText(safeGetElement('#import-export-page .card-title'), t.nav_import_export);
-                safeSetText(safeGetElement('#import-export-page .form-group:nth-child(1) .form-label'), t.import_title);
-                const importGroup1P = safeGetElement('#import-export-page .form-group:nth-child(1) p');
-                if (importGroup1P) {
-                    importGroup1P.textContent = t.import_label;
+                safeSetText(safeGetElement('#import-label'), t.import_title);
+                const importDesc = safeGetElement('#import-description');
+                if (importDesc) {
+                    importDesc.textContent = t.import_label;
                 }
-                safeSetText(safeGetElement('#import-export-page .form-group:nth-child(2) .form-label'), t.export_title);
-                const importGroup2P = safeGetElement('#import-export-page .form-group:nth-child(2) p');
-                if (importGroup2P) {
-                    importGroup2P.textContent = t.export_text;
+                safeSetText(safeGetElement('#export-label'), t.export_title);
+                const exportDesc = safeGetElement('#export-description');
+                if (exportDesc) {
+                    exportDesc.textContent = t.export_text;
                 }
-                safeSetHTML(safeGetElement('#import-export-page #export-btn'), `<span class="icon">📤</span> ${t.export_btn}`);
+                safeSetHTML(safeGetElement('#export-btn'), `<span class="icon">📤</span> ${t.export_btn}`);
 
                 // Update help page
                 safeSetText(safeGetElement('#help-page .card-title'), t.help_title);
@@ -2940,7 +3637,7 @@
                 // Update footer status
                 const statusP = safeGetElement('#help-page .text-secondary.mt-4');
                 if (statusP) {
-                    statusP.innerHTML = `<strong>${t.status_label}</strong> ${t.status_0_5_0}<br><strong>${t.progress_0_5_0}</strong>`;
+                    statusP.innerHTML = `<strong>${t.status_label}</strong> ${t.status_0_8_0}<br><strong>${t.progress_0_8_0}</strong>`;
                 }
 
                 console.log('updateAllText() completed');
@@ -2975,15 +3672,15 @@
                 console.log(`Filter search: "${searchValue}"`);
             }
 
-            onFilterTypeChange(event) {
-                const typeValue = event.target.value;
+            onFilterTypeChange() {
+                const typeValue = document.getElementById('filter-type').value;
                 AppState.filterType = typeValue;
                 this.renderQuestions();
                 console.log(`Filter type: "${typeValue}"`);
             }
 
-            onFilterCategoryChange(event) {
-                const categoryValue = event.target.value;
+            onFilterCategoryChange() {
+                const categoryValue = document.getElementById('filter-category').value;
                 AppState.filterCategory = categoryValue;
                 this.renderQuestions();
                 console.log(`Filter category: "${categoryValue}"`);
@@ -3083,6 +3780,152 @@
                 console.log('Filters reset, all questions shown');
             }
 
+            // ==================== IMPORT/EXPORT ====================
+            exportQuestions() {
+                const t = Translations[AppState.language];
+                
+                const exportData = {
+                    version: '2.11.0',
+                    exportDate: new Date().toISOString(),
+                    category: 'all',
+                    totalQuestions: AppState.questions.length,
+                    questions: AppState.questions.map(q => q.toJson())
+                };
+
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `quiz_questions_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                this.showToast('success', t.toast_success, t.export_success);
+            }
+
+            handleImport(data) {
+                const t = Translations[AppState.language];
+
+                const validation = this.validateImportData(data);
+                if (!validation.isValid) {
+                    this.showToast('error', t.toast_error, validation.message);
+                    return;
+                }
+
+                const importCount = validation.questions.length;
+
+                if (AppState.questions.length > 0 && importCount > 0) {
+                    const merge = confirm(t.import_merge_confirm.replace('{count}', importCount));
+                    if (merge) {
+                        this.mergeQuestions(validation.questions);
+                        this.showToast('success', t.toast_success, t.import_merge_success.replace('{count}', importCount));
+                    } else {
+                        this.showToast('warning', t.toast_warning, t.import_cancelled);
+                    }
+                } else {
+                    AppState.questions = validation.questions;
+                    this.saveQuestions();
+                    this.updateUI();
+                    this.showToast('success', t.toast_success, t.import_success.replace('{count}', importCount));
+                }
+
+                document.getElementById('import-file').value = '';
+            }
+
+            validateImportData(data) {
+                const t = Translations[AppState.language];
+                
+                if (!data || typeof data !== 'object') {
+                    return { isValid: false, message: t.import_error_invalid };
+                }
+
+                let questions = [];
+
+                if (Array.isArray(data)) {
+                    questions = data;
+                } else if (data.questions && Array.isArray(data.questions)) {
+                    questions = data.questions;
+                } else {
+                    return { isValid: false, message: t.import_error_no_questions };
+                }
+
+                const validQuestions = [];
+                const errors = [];
+
+                questions.forEach((q, idx) => {
+                    try {
+                        const question = Question.fromJson(q);
+                        validQuestions.push(question);
+                    } catch (error) {
+                        errors.push(`Question ${idx + 1}: ${error.message}`);
+                    }
+                });
+
+                if (validQuestions.length === 0) {
+                    return { isValid: false, message: t.import_error_no_valid };
+                }
+
+                if (errors.length > 0) {
+                    console.warn('Import errors:', errors);
+                }
+
+                return { isValid: true, questions: validQuestions, errors };
+            }
+
+            mergeQuestions(newQuestions) {
+                const existingIds = new Set(AppState.questions.map(q => q.id));
+                const mergedQuestions = [];
+
+                newQuestions.forEach(q => {
+                    if (!existingIds.has(q.id)) {
+                        mergedQuestions.push(q);
+                    }
+                });
+
+                AppState.questions = [...AppState.questions, ...mergedQuestions];
+                this.saveQuestions();
+                this.updateUI();
+            }
+
+            exportToClipboard() {
+                const t = Translations[AppState.language];
+
+                const exportData = {
+                    version: '2.11.0',
+                    exportDate: new Date().toISOString(),
+                    category: 'all',
+                    totalQuestions: AppState.questions.length,
+                    questions: AppState.questions.map(q => q.toJson())
+                };
+
+                const dataStr = JSON.stringify(exportData, null, 2);
+
+                navigator.clipboard.writeText(dataStr).then(() => {
+                    this.showToast('success', t.toast_success, t.clipboard_copy_success);
+                }).catch((error) => {
+                    this.showToast('error', t.toast_error, t.clipboard_copy_failed);
+                });
+            }
+
+            importFromClipboard() {
+                const t = Translations[AppState.language];
+
+                navigator.clipboard.readText().then((text) => {
+                    try {
+                        const data = JSON.parse(text);
+                        this.handleImport(data);
+                    } catch (error) {
+                        this.showToast('error', t.toast_error, t.import_error_invalid);
+                    }
+                }).catch((error) => {
+                    this.showToast('error', t.toast_error, t.clipboard_read_failed);
+                });
+            }
+
             // ==================== TOAST NOTIFICATIONS ====================
             showToast(type, title, message) {
                 const container = document.getElementById('toast-container');
@@ -3113,9 +3956,9 @@
         // ==================== INITIALIZE APP ====================
         const app = new QuizEditorApp();
 
-        console.log('Quiz Question Editor v0.5.0 loaded successfully!');
+        console.log('Quiz Question Editor v0.8.0 loaded successfully!');
         console.log('Language:', AppState.language);
-        console.log('Progress: 50% of implementation plan');
+        console.log('Progress: 80% of implementation plan');
     </script>
 </body>
 </html>
