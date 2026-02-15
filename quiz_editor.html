@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Quiz Question Editor - Create and edit quiz questions compatible with Android app v2.11.2+">
-    <title>Quiz Question Editor v0.8.0</title>
+    <title>Quiz Question Editor v0.9.7</title>
 
     <style>
         /* ==================== CSS VARIABLES ==================== */
@@ -445,6 +445,85 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+        }
+
+        /* ==================== MODAL DIALOG ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: modalFadeIn 0.2s ease;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-overlay:not(.hidden) {
+            display: flex;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .modal-message {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+            min-width: 120px;
         }
 
         /* ==================== EMPTY STATE ==================== */
@@ -1368,12 +1447,17 @@
         </button>
     </div>
 
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" id="sidebar-toggle" onclick="app.toggleSidebar()">
+        ☰
+    </button>
+
     <div id="app">
         <!-- Sidebar -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1 class="sidebar-title">Quiz Editor</h1>
-                    <span class="sidebar-version">v0.8</span>
+                    <span class="sidebar-version">v0.9.7</span>
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -1463,7 +1547,7 @@
                          </div>
                         <div class="filter-group">
                             <label class="filter-label">📋 Typ</label>
-                            <select class="form-control" id="filter-type" onchange="app.onFilterTypeChange()">
+                            <select class="form-control" id="filter-type" onchange="app.onFilterTypeChange(event)">
                                 <option value="all">Wszystkie</option>
                                 <option value="single">Single Choice</option>
                                 <option value="multiple">Multiple Choice</option>
@@ -1473,9 +1557,14 @@
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">📁 Kategoria</label>
-                            <select class="form-control" id="filter-category" onchange="app.onFilterCategoryChange()">
-                                <option value="">Wszystkie</option>
-                            </select>
+                            <div class="flex gap-2">
+                                <select class="form-control" id="filter-category" onchange="app.onFilterCategoryChange(event)" style="flex: 1;">
+                                    <option value="">Wszystkie</option>
+                                </select>
+                                <button class="btn btn-danger btn-sm" id="clear-category-btn" onclick="app.clearCategory()" style="flex: 0;">
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">🏷️ Tagi</label>
@@ -1669,11 +1758,16 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" id="export-label">Eksport pytań</label>
-                        <button class="btn btn-primary" id="export-btn">
-                            <span class="icon">📤</span>
-                            Eksportuj do pliku
-                        </button>
-                        <p class="text-secondary mt-4" id="export-description">Eksportuje wszystkie pytania do formatu JSON v2.11.0.</p>
+                        <div class="flex gap-2">
+                            <select class="form-control" id="export-category" style="flex: 1;">
+                                <option value="">Wszystkie kategorie</option>
+                            </select>
+                            <button class="btn btn-primary" id="export-btn">
+                                <span class="icon">📤</span>
+                                Eksportuj
+                            </button>
+                        </div>
+                        <p class="text-secondary mt-4" id="export-description">Eksportuje pytania do formatu JSON v2.11.0.</p>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Schowek (Clipboard)</label>
@@ -1687,6 +1781,16 @@
                                 Wklej ze schowka
                             </button>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Zarządzanie bazą pytań</label>
+                        <button class="btn btn-danger" onclick="app.clearAllQuestions()">
+                            <span class="icon">🗑️</span>
+                            Usuń wszystkie pytania
+                        </button>
+                        <p class="text-warning mt-4" style="color: var(--error-color);">
+                            ⚠️ Ostrzeżenie: Usunięcie wszystkich pytań jest nieodwracalne!
+                        </p>
                     </div>
                 </div>
             </section>
@@ -2357,6 +2461,15 @@
                         reader.readAsText(file);
                     }
                 });
+
+                // Click outside to close sidebar (mobile)
+                document.addEventListener('click', (e) => {
+                    const sidebar = document.getElementById('sidebar');
+                    const toggleBtn = document.getElementById('sidebar-toggle');
+                    if (sidebar && !sidebar.contains(e.target) && toggleBtn && !toggleBtn.contains(e.target)) {
+                        sidebar.classList.remove('open');
+                    }
+                });
             }
 
             // ==================== NAVIGATION ====================
@@ -2384,40 +2497,36 @@
                 console.log(`Navigated to: ${pageName}`);
             }
 
-            // ==================== QUESTIONS ====================
-            getFilteredQuestions() {
-                return AppState.questions.filter(q => {
-                    const matchesSearch = AppState.filterSearch === '' || 
-                        q.text.toLowerCase().includes(AppState.filterSearch.toLowerCase()) ||
-                        q.category.toLowerCase().includes(AppState.filterSearch.toLowerCase());
-
-                    const matchesType = AppState.filterType === 'all' || q.type === AppState.filterType;
-
-                    const matchesCategory = AppState.filterCategory === '' || q.category === AppState.filterCategory;
-
-                    const matchesTags = AppState.filterTags.length === 0 || 
-                        (q.tags && q.tags.some(tag => AppState.filterTags.includes(tag)));
-
-                    return matchesSearch && matchesType && matchesCategory && matchesTags;
-                });
+            // ==================== TOGGLE SIDEBAR ====================
+            toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('open');
             }
 
+            // ==================== QUESTIONS ====================
             loadQuestions() {
                 const saved = localStorage.getItem('questions');
                 if (saved) {
                     try {
-                        AppState.questions = JSON.parse(saved);
+                        const parsed = JSON.parse(saved);
+                        AppState.questions = parsed.map(q => Question.fromJson(q));
                         console.log(`Loaded ${AppState.questions.length} questions`);
+                        if (AppState.questions.length > 0) {
+                            console.log('First question ID:', AppState.questions[0].id);
+                            console.log('First question type:', typeof AppState.questions[0].id);
+                        }
                     } catch (e) {
                         console.error('Error loading questions:', e);
                         AppState.questions = [];
                     }
                 }
+                this.updateExportCategoryDropdown();
                 this.updateUI();
             }
 
             saveQuestions() {
                 localStorage.setItem('questions', JSON.stringify(AppState.questions));
+                this.updateExportCategoryDropdown();
             }
 
             // ==================== UI UPDATES ====================
@@ -2520,14 +2629,45 @@
                 const container = document.getElementById('questions-list');
                 if (!container) return;
 
-                const filteredQuestions = this.getFilteredQuestions();
-
-                // Get questions for current page
+                const filtered = this.getFilteredQuestions();
                 const start = AppState.currentPageIndex * AppState.itemsPerPage;
                 const end = start + AppState.itemsPerPage;
-                const questions = filteredQuestions.slice(start, end);
+                const questions = filtered.slice(start, end);
 
                 container.innerHTML = questions.map(q => this.renderQuestionCard(q)).join('');
+            }
+
+            getFilteredQuestions() {
+                let questions = AppState.questions;
+
+                // Filtrowanie po tekście
+                if (AppState.filterSearch.trim() !== '') {
+                    const searchLower = AppState.filterSearch.toLowerCase();
+                    questions = questions.filter(q => {
+                        return q.text.toLowerCase().includes(searchLower) ||
+                               q.options.some(o => o.toLowerCase().includes(searchLower));
+                    });
+                }
+
+                // Filtrowanie po typie
+                if (AppState.filterType !== 'all') {
+                    questions = questions.filter(q => q.type === AppState.filterType);
+                }
+
+                // Filtrowanie po kategorii
+                if (AppState.filterCategory && AppState.filterCategory !== 'all') {
+                    questions = questions.filter(q => q.category === AppState.filterCategory);
+                }
+
+                // Filtrowanie po tagach
+                if (AppState.filterTags.length > 0) {
+                    questions = questions.filter(q => {
+                        const questionTags = q.tags || [];
+                        return AppState.filterTags.every(tag => questionTags.includes(tag));
+                    });
+                }
+
+                return questions;
             }
 
             // ==================== RENDER QUESTION CARD ====================
@@ -2636,22 +2776,20 @@
                 const controls = document.getElementById('pagination-controls');
                 const info = document.getElementById('pagination-info');
 
-                if (!container) return;
+                const filtered = this.getFilteredQuestions();
 
-                const filteredQuestions = this.getFilteredQuestions();
-
-                if (filteredQuestions.length === 0) {
+                if (!container || filtered.length === 0) {
                     container.classList.add('hidden');
                     return;
                 }
 
                 container.classList.remove('hidden');
 
-                const totalPages = Math.ceil(filteredQuestions.length / AppState.itemsPerPage);
+                const totalPages = Math.ceil(filtered.length / AppState.itemsPerPage);
                 const start = AppState.currentPageIndex * AppState.itemsPerPage + 1;
-                const end = Math.min(start + AppState.itemsPerPage - 1, filteredQuestions.length);
+                const end = Math.min(start + AppState.itemsPerPage - 1, filtered.length);
 
-                info.textContent = `${t.showing} ${start}-${end} ${t.of} ${filteredQuestions.length} ${t.questions}`;
+                info.textContent = `${t.showing} ${start}-${end} ${t.of} ${filtered.length} ${t.questions}`;
 
                 // Render page buttons
                 let buttonsHtml = '';
@@ -2707,13 +2845,16 @@
             }
 
             nextPage() {
-                const totalPages = Math.ceil(AppState.questions.length / AppState.itemsPerPage);
+                const filtered = this.getFilteredQuestions();
+                const totalPages = Math.ceil(filtered.length / AppState.itemsPerPage);
                 if (AppState.currentPageIndex < totalPages - 1) {
                     this.goToPage(AppState.currentPageIndex + 1);
                 }
             }
 
             prevPage() {
+                const filtered = this.getFilteredQuestions();
+                const totalPages = Math.ceil(filtered.length / AppState.itemsPerPage);
                 if (AppState.currentPageIndex > 0) {
                     this.goToPage(AppState.currentPageIndex - 1);
                 }
@@ -2721,8 +2862,27 @@
 
             // ==================== QUESTION ACTIONS ====================
             editQuestion(id) {
-                AppState.editingQuestionId = id;
-                this.openEditor(id);
+                console.log('editQuestion called with id:', id);
+                console.log('id type:', typeof id);
+                console.log('AppState.questions.length:', AppState.questions.length);
+
+                if (AppState.questions.length > 0) {
+                    console.log('First question in AppState.questions:', AppState.questions[0]);
+                    console.log('First question ID:', AppState.questions[0].id);
+                    console.log('First question ID type:', typeof AppState.questions[0].id);
+                }
+
+                const question = AppState.questions.find(q => q.id === id || q.id == id);
+                console.log('Found question:', question);
+
+                if (question) {
+                    console.log('Opening editor with question:', question);
+                    AppState.editingQuestionId = id;
+                    this.openEditor(id);
+                } else {
+                    console.error('Question not found with id:', id);
+                    this.showToast('error', 'Błąd', 'Nie znaleziono pytania do edycji');
+                }
             }
 
             // ==================== EDITOR ====================
@@ -2732,15 +2892,26 @@
 
                 this.navigateTo('create');
 
-                if (isNew) {
-                    AppState.editingQuestionId = null;
-                    document.getElementById('editor-title').textContent = t.editor_title_new;
-                    this.resetForm();
-                } else {
-                    AppState.editingQuestionId = id;
-                    document.getElementById('editor-title').textContent = t.editor_title_edit;
-                    this.loadQuestionToForm(id);
-                }
+                // Wait for DOM to be ready after navigation
+                setTimeout(() => {
+                    if (isNew) {
+                        AppState.editingQuestionId = null;
+                        document.getElementById('editor-title').textContent = t.editor_title_new;
+                        this.resetForm();
+                    } else {
+                        AppState.editingQuestionId = id;
+                        document.getElementById('editor-title').textContent = t.editor_title_edit;
+
+                        const question = AppState.questions.find(q => q.id === id);
+                        if (question) {
+                            console.log('Loading question to form:', question);
+                            this.loadQuestionToForm(id);
+                        } else {
+                            console.error('Question not found:', id);
+                            this.showToast('error', 'Błąd', 'Nie znaleziono pytania');
+                        }
+                    }
+                }, 50);
             }
 
             closeEditor() {
@@ -2775,8 +2946,13 @@
             }
 
             loadQuestionToForm(id) {
+                console.log('loadQuestionToForm called with id:', id);
                 const question = AppState.questions.find(q => q.id === id);
-                if (!question) return;
+                if (!question) {
+                    console.error('Question not found in AppState.questions:', id);
+                    return;
+                }
+                console.log('Question found:', question);
 
                 document.getElementById('question-id').value = question.id;
                 document.getElementById('question-type').value = question.type;
@@ -2785,11 +2961,15 @@
                 document.getElementById('question-explanation').value = question.explanation || '';
                 document.getElementById('question-difficulty').value = question.difficulty || 1;
 
+                console.log('Setting question type:', question.type);
+
                 this.setDifficulty(question.difficulty || 1);
                 this.renderTags(question.tags || []);
                 this.renderOptionsEditor(question);
                 this.loadImage(question.imageData || null);
                 this.updatePreview();
+
+                 console.log('loadQuestionToForm completed');
             }
 
             setDifficulty(value) {
@@ -3459,7 +3639,11 @@
             }
 
             copyQuestion(id) {
-                const question = AppState.questions.find(q => q.id === id);
+                console.log('copyQuestion called with id:', id);
+                console.log('id type:', typeof id);
+                const question = AppState.questions.find(q => q.id === id || q.id == id);
+                console.log('Found question for copy:', question);
+
                 if (question) {
                     const newQuestion = new Question({
                         ...question
@@ -3469,7 +3653,12 @@
                     AppState.questions.unshift(newQuestion);
                     this.saveQuestions();
                     this.updateUI();
-                    this.showToast('success', this.t('toast_success'), this.t('copy_success'));
+                    const t = Translations[AppState.language];
+                    this.showToast('success', t.toast_success, t.copy_success);
+                } else {
+                    console.error('Question not found for copy:', id);
+                    const t = Translations[AppState.language];
+                    this.showToast('error', 'Błąd', 'Nie znaleziono pytania do skopiowania');
                 }
             }
 
@@ -3672,15 +3861,17 @@
                 console.log(`Filter search: "${searchValue}"`);
             }
 
-            onFilterTypeChange() {
-                const typeValue = document.getElementById('filter-type').value;
+            onFilterTypeChange(event) {
+                if (!event || !event.target) return;
+                const typeValue = event.target.value;
                 AppState.filterType = typeValue;
                 this.renderQuestions();
                 console.log(`Filter type: "${typeValue}"`);
             }
 
-            onFilterCategoryChange() {
-                const categoryValue = document.getElementById('filter-category').value;
+            onFilterCategoryChange(event) {
+                if (!event || !event.target) return;
+                const categoryValue = event.target.value;
                 AppState.filterCategory = categoryValue;
                 this.renderQuestions();
                 console.log(`Filter category: "${categoryValue}"`);
@@ -3702,27 +3893,229 @@
                 console.log(`Tag removed: ${tag}`);
             }
 
+            toggleFilterTag(tag) {
+                if (AppState.filterTags.includes(tag)) {
+                    AppState.filterTags = AppState.filterTags.filter(t => t !== tag);
+                } else {
+                    AppState.filterTags.push(tag);
+                }
+                this.renderFilterTags();
+                this.renderActiveTags();
+                this.renderQuestions();
+                console.log(`Tag toggled: ${tag}`);
+            }
+
+            removeFilterTag(tag) {
+                AppState.filterTags = AppState.filterTags.filter(t => t !== tag);
+                this.renderFilterTags();
+                this.renderActiveTags();
+                this.renderQuestions();
+                console.log(`Filter tag removed: ${tag}`);
+            }
+
             // ==================== RENDER FILTER TAGS ====================
             renderFilterTags() {
                 const tagsContainer = document.getElementById('filter-tags-container');
                 if (!tagsContainer) return;
 
-                const tags = [...new Set(AppState.questions.flatMap(q => q.tags || []))];
-                const currentTags = AppState.filterTags;
+                // Count tag usage
+                const tagCounts = {};
+                AppState.questions.forEach(q => {
+                    (q.tags || []).forEach(tag => {
+                        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                    });
+                });
+
+                // Get top 20 most used tags
+                const sortedTags = Object.entries(tagCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 20);
 
                 // Clear container
                 tagsContainer.innerHTML = '';
 
-                tags.forEach(tag => {
-                    const isSelected = currentTags.includes(tag);
-                    const chipClass = isSelected ? 'chip active' : 'chip';
+                // Create dropdown select
+                const select = document.createElement('select');
+                select.className = 'form-control';
+                select.id = 'filter-tag-select';
+                select.style.marginBottom = '0.5rem';
 
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Wybierz tag...';
+                select.appendChild(defaultOption);
+
+                sortedTags.forEach(([tag, count]) => {
+                    const option = document.createElement('option');
+                    option.value = tag;
+                    option.textContent = `${tag} (${count})`;
+                    select.appendChild(option);
+                });
+
+                select.onchange = () => {
+                    const selectedTag = select.value;
+                    if (selectedTag && !AppState.filterTags.includes(selectedTag)) {
+                        AppState.filterTags.push(selectedTag);
+                        this.renderFilterTags();
+                        this.renderActiveTags();
+                        this.renderQuestions();
+                    }
+                    select.value = '';
+                };
+
+                tagsContainer.appendChild(select);
+
+                // Render active tags as removable chips
+                this.renderActiveTags();
+            }
+
+            renderActiveTags() {
+                const tagsContainer = document.getElementById('filter-tags-container');
+                if (!tagsContainer) return;
+
+                // Find existing active tags container or create one
+                let activeContainer = document.getElementById('active-filter-tags');
+                if (!activeContainer) {
+                    activeContainer = document.createElement('div');
+                    activeContainer.id = 'active-filter-tags';
+                    activeContainer.style.display = 'flex';
+                    activeContainer.style.flexWrap = 'wrap';
+                    activeContainer.style.gap = '0.5rem';
+                    tagsContainer.appendChild(activeContainer);
+                }
+
+                // Clear active tags
+                activeContainer.innerHTML = '';
+
+                // Add active filter tags as chips
+                AppState.filterTags.forEach(tag => {
                     const chip = document.createElement('div');
-                    chip.className = `chip ${chipClass}`;
+                    chip.className = 'filter-chip';
                     chip.textContent = tag;
-                    chip.onclick = () => this.onRemoveTag(tag);
 
-                    tagsContainer.appendChild(chip);
+                    const removeBtn = document.createElement('span');
+                    removeBtn.className = 'filter-chip-remove';
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.onclick = () => {
+                        this.removeFilterTag(tag);
+                    };
+
+                    chip.appendChild(removeBtn);
+                    activeContainer.appendChild(chip);
+                });
+            }
+
+            // ==================== MODAL DIALOG ====================
+            showModal(title, message, buttons) {
+                const overlay = document.getElementById('modal-overlay');
+                const titleEl = document.getElementById('modal-title');
+                const messageEl = document.getElementById('modal-message');
+                const actionsEl = document.getElementById('modal-actions');
+
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+
+                actionsEl.innerHTML = '';
+                buttons.forEach(btn => {
+                    const button = document.createElement('button');
+                    button.className = `btn ${btn.className || 'btn-outline'}`;
+                    button.textContent = btn.text;
+                    button.onclick = () => {
+                        if (btn.action) btn.action();
+                        this.hideModal();
+                    };
+                    actionsEl.appendChild(button);
+                });
+
+                overlay.classList.remove('hidden');
+            }
+
+            hideModal() {
+                const overlay = document.getElementById('modal-overlay');
+                overlay.classList.add('hidden');
+            }
+
+            clearAllQuestions() {
+                const count = AppState.questions.length;
+                this.showModal(
+                    'Czy na pewno usunąć wszystkie pytania?',
+                    `Ta operacja usunie ${count} pytań i nie może być cofnięta.`,
+                    [
+                        {
+                            text: 'Anuluj',
+                            className: 'btn-outline',
+                            action: () => {
+                                // Do nothing
+                            }
+                        },
+                        {
+                            text: 'Usuń wszystko',
+                            className: 'btn-danger',
+                            action: () => {
+                                AppState.questions = [];
+                                this.saveQuestions();
+                                this.updateUI();
+                                this.showToast('success', 'Sukces', 'Usunięto wszystkie pytania');
+                            }
+                        }
+                    ]
+                );
+            }
+
+            clearCategory() {
+                const category = AppState.filterCategory;
+                if (!category) {
+                    this.showToast('warning', 'Ostrzeżenie', 'Wybierz kategorię do wyczyszczenia');
+                    return;
+                }
+
+                const count = AppState.questions.filter(q => q.category === category).length;
+                this.showModal(
+                    'Czy na pewno usunąć pytania z tej kategorii?',
+                    `Ta operacja usunie ${count} pytań z kategorii "${category}" i nie może być cofnięta.`,
+                    [
+                        {
+                            text: 'Anuluj',
+                            className: 'btn-outline',
+                            action: () => {
+                                // Do nothing
+                            }
+                        },
+                        {
+                            text: 'Usuń kategorię',
+                            className: 'btn-danger',
+                            action: () => {
+                                AppState.questions = AppState.questions.filter(q => q.category !== category);
+                                AppState.filterCategory = '';
+                                document.getElementById('filter-category').value = '';
+                                this.saveQuestions();
+                                this.updateUI();
+                                this.showToast('success', 'Sukces', `Usunięto ${count} pytań z kategorii "${category}"`);
+                            }
+                        }
+                    ]
+                );
+            }
+
+            updateExportCategoryDropdown() {
+                const exportCategorySelect = document.getElementById('export-category');
+                if (!exportCategorySelect) return;
+
+                // Clear existing options (except the first one)
+                while (exportCategorySelect.options.length > 1) {
+                    exportCategorySelect.remove(1);
+                }
+
+                // Get all unique categories
+                const categories = [...new Set(AppState.questions.map(q => q.category).filter(c => c))];
+                categories.sort();
+
+                // Add categories to dropdown
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    exportCategorySelect.appendChild(option);
                 });
             }
 
@@ -3783,22 +4176,38 @@
             // ==================== IMPORT/EXPORT ====================
             exportQuestions() {
                 const t = Translations[AppState.language];
-                
+                const exportCategory = document.getElementById('export-category').value;
+
+                let questionsToExport = AppState.questions;
+                let exportCategoryName = 'all';
+
+                if (exportCategory && exportCategory.trim() !== '') {
+                    questionsToExport = AppState.questions.filter(q => q.category === exportCategory);
+                    exportCategoryName = exportCategory;
+                }
+
                 const exportData = {
                     version: '2.11.0',
                     exportDate: new Date().toISOString(),
-                    category: 'all',
-                    totalQuestions: AppState.questions.length,
-                    questions: AppState.questions.map(q => q.toJson())
+                    category: exportCategoryName,
+                    totalQuestions: questionsToExport.length,
+                    questions: questionsToExport.map(q => q.toJson())
                 };
 
                 const dataStr = JSON.stringify(exportData, null, 2);
                 const dataBlob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(dataBlob);
-                
+
+                const dateStr = new Date().toISOString().split('T')[0];
+                let filename = 'quiz_questions_' + dateStr + '.json';
+
+                if (exportCategory && exportCategory.trim() !== '') {
+                    filename = 'quiz_questions_' + exportCategory.toLowerCase().replace(/\s+/g, '_') + '_' + dateStr + '.json';
+                }
+
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `quiz_questions_${new Date().toISOString().split('T')[0]}.json`;
+                link.download = filename;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -3819,13 +4228,38 @@
                 const importCount = validation.questions.length;
 
                 if (AppState.questions.length > 0 && importCount > 0) {
-                    const merge = confirm(t.import_merge_confirm.replace('{count}', importCount));
-                    if (merge) {
-                        this.mergeQuestions(validation.questions);
-                        this.showToast('success', t.toast_success, t.import_merge_success.replace('{count}', importCount));
-                    } else {
-                        this.showToast('warning', t.toast_warning, t.import_cancelled);
-                    }
+                    // Show custom modal with Merge/Replace/Cancel options
+                    this.showModal(
+                        t.import_merge_confirm.replace('{count}', importCount),
+                        '',
+                        [
+                            {
+                                text: 'Merge (Dołącz)',
+                                className: 'btn-primary',
+                                action: () => {
+                                    this.mergeQuestions(validation.questions);
+                                    this.showToast('success', t.toast_success, t.import_merge_success.replace('{count}', importCount));
+                                }
+                            },
+                            {
+                                text: 'Replace (Zamień)',
+                                className: 'btn-danger',
+                                action: () => {
+                                    AppState.questions = validation.questions;
+                                    this.saveQuestions();
+                                    this.updateUI();
+                                    this.showToast('success', t.toast_success, t.import_merge_success.replace('{count}', importCount));
+                                }
+                            },
+                            {
+                                text: 'Anuluj',
+                                className: 'btn-outline',
+                                action: () => {
+                                    this.showToast('warning', t.toast_warning, t.import_cancelled);
+                                }
+                            }
+                        ]
+                    );
                 } else {
                     AppState.questions = validation.questions;
                     this.saveQuestions();
@@ -3956,9 +4390,20 @@
         // ==================== INITIALIZE APP ====================
         const app = new QuizEditorApp();
 
-        console.log('Quiz Question Editor v0.8.0 loaded successfully!');
+        console.log('Quiz Question Editor v0.9.7 loaded successfully!');
         console.log('Language:', AppState.language);
-        console.log('Progress: 80% of implementation plan');
+        console.log('Progress: 97% of implementation plan');
     </script>
+
+    <!-- Modal Dialog -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 class="modal-title" id="modal-title"></h3>
+            <p class="modal-message" id="modal-message"></p>
+            <div class="modal-actions" id="modal-actions">
+                <!-- Buttons will be dynamically added -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
