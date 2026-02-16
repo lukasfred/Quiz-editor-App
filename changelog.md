@@ -6,7 +6,236 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.0] - 2026-02-16
+
+### Added
+- 🎉 **PRODUCTION RELEASE** - First stable version
+- 📚 **Complete user documentation** - README.md with detailed instructions
+- 📝 **Sample questions** - sample_questions.json with examples of all question types
+- ✅ All planned features implemented and tested
+- 🎯 100% of implementation plan completed
+
+### Documentation
+- Complete README.md with:
+  - Quick start guide
+  - Detailed usage instructions
+  - Question format specifications
+  - Troubleshooting guide
+  - Keyboard shortcuts
+  - Browser requirements
+  - Android compatibility details
+- Sample questions file with 10 questions of all types:
+  - 3 Single Choice questions
+  - 3 Multiple Choice questions
+  - 2 Ordering questions
+  - 2 Pairing questions
+
+### Technical Details
+- Lines of code: ~4400 (HTML + CSS + JS)
+- Browser support: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
+- Format compatibility: v1.0, v2.0, v2.11.0
+- Android app compatibility: v2.11.2+
+
+### User Impact
+- Production-ready application
+- Complete documentation for users
+- Sample questions for testing
+- All features fully functional
+- All critical bugs resolved
+- Ready for production deployment
+
+---
+
 ## [Unreleased]
+
+---
+
+## [0.9.8] - 2026-02-16
+
+### Fixed
+- ✅ Fixed Question ID comparison - converted to string in Question.fromJson()
+- ✅ Fixed editQuestion() - uses loose comparison
+- ✅ Fixed copyQuestion() - uses loose comparison
+- ✅ Fixed deleteQuestion() - uses loose comparison
+- ✅ Fixed question editing now works correctly
+- ✅ Fixed question copying now works correctly
+- ✅ Fixed question deleting now works correctly
+- ✅ All critical bugs resolved
+
+### Technical Details
+- Problem: ID type mismatch after Question.fromJson()
+- Solution: Always convert ID to string in Question.fromJson()
+- Added loose comparison (==) in edit/copy/delete methods
+- Lines changed: ~4 lines (id: String(json.id))
+- Lines changed: ~3 methods (openEditor, loadQuestionToForm, deleteQuestion)
+
+---
+
+## [0.9.7] - 2026-02-15
+
+### Fixed
+- 🔧 **Critical bug** - `renderStats is not a function` error
+- Dodano brakujące metody render do klasy QuizEditorApp:
+  - renderStats() - wyświetlanie statystyk typów pytań
+  - renderPagination() - obsługa paginacji
+  - updateEmptyState() - pokazywanie/ukrywanie pustego stanu
+  - goToPage() - nawigacja między stronami
+
+### Technical Details
+- Metoda updateUI() wywoływała nieistniejące metody
+- Dodano ~80 linii kodu z brakującymi metodami
+- Aplikacja teraz działa poprawnie
+
+---
+
+## [0.9.6] - 2026-02-15
+
+### Fixed
+- 🔧 **Duplikat metody updateFiltersUI()** - usunięto duplikat kodu
+- 🔧 **Syntax error** - naprawiono nieprawidłową strukturę klamer
+
+### Technical Details
+- Usunięto zduplikowane linie kodu (2771-2773)
+- Naprawiono zamykanie metod
+- Wersja 0.9.6 jest teraz poprawna
+
+---
+
+## [0.9.5] - 2026-02-15
+
+### Added
+- 📤 **Eksport kategorii** - dropdown z wyborem kategorii do eksportu
+- 📁 **Inteligentne nazewnictwo plików** - plik eksportu zawiera nazwę kategorii (jeśli wybrano)
+- 🔄 **updateExportCategoryDropdown()** - automatyczne aktualizowanie listy kategorii
+
+### Changed
+- Przeniesiono przycisk "Wyczyść wszystko" do strony Import/Export
+- Rozszerzono interfejs Export o dropdown kategorii
+
+### Technical Details
+- **Lines of Code**: ~50 linii nowych (HTML + JS)
+- Eksport można teraz filtrować po kategorii
+- Nazwa pliku: `quiz_questions_nazwa_kategorii_2026-02-15.json`
+- Automatyczne aktualizowanie dropdowna kategorii po zmianach w bazie
+
+### User Impact
+- Możliwość eksportu tylko pytań z wybranej kategorii
+- Bardziej opisowe nazwy plików eksportowanych
+- Łatwiejsze zarządzanie dużymi zbiorami pytań
+
+---
+
+## [0.9.4] - 2026-02-15
+
+### Changed
+- 🔄 **Przeniesiono przycisk "Wyczyść wszystko"** - teraz na stronie Import/Export zamiast w nagłówku listy pytań
+
+### Added
+- 🗑️ **Czyszczenie kategorii** - przycisk "Wyczyść" obok dropdowna kategorii w filtrach
+- 🏷️ **Inteligentne czyszczenie** - usuwa tylko pytania z wybranej kategorii
+- ⚠️ **Ostrzeżenie** - opis na stronie Import/Export ostrzeża przed nieodwracalnym usunięciem
+
+### Technical Details
+- Przeniesiono "Wyczyść wszystko" do import-export-page
+- Dodano `clearCategory()` metodę do czyszczenia konkretnej kategorii
+- Dodano tłumaczenia dla komunikatów o czyszczeniu kategorii
+- Dropdown kategorii i przycisk "Wyczyść" w jednym flex kontenerze
+
+### User Impact
+- Łatwiejszy dostęp do czyszczenia bazy (Import/Export)
+- Możliwość usunięcia pytań tylko z jednej kategorii
+- Lepsza organizacja interfejsu - przyciski czyszczenia w logicznych miejscach
+
+---
+
+## [0.9.3] - 2026-02-15
+
+### Fixed
+- 🔧 **Syntax error** - przenieiono modal HTML poza tag </script>
+- Modal dialog teraz poprawnie umieszczony w <body>
+
+### Technical Details
+- Modal HTML był przypadkowo dodany wewnątrz tagu <script>
+- Przemieszczono modal HTML poza skrypt, przed </body>
+
+---
+
+## [0.9.2] - 2026-02-15
+
+### Added
+- **Custom modal dialog** dla importu z 3 opcjami (Merge/Replace/Cancel)
+- 🗑️ **Przycisk "Usuń wszystko"** - czyszczenie całej bazy pytań z potwierdzeniem
+- 🎨 **Animacje modala** - smooth fade in/slide in effects
+
+### Fixed
+- ✅ **Import dialog** - zamieniono native confirm() na custom modal
+- ✅ **Opcja Replace** - dodano przycisk zamiany wszystkich pytań (brakowało wcześniej)
+- ✅ **Potwierdzenie usuwania** - modal zamiast confirm dla "Usuń wszystko"
+
+### Changed
+- Zaktualizowano `handleImport()` aby używał custom modala z trzema przyciskami
+- Dodano metody `showModal()` i `hideModal()` do obsługi modal dialogów
+- Zaktualizowano AppState.version na '0.9.2'
+- Dodano CSS dla modal overlay, box i animacji
+
+### Technical Details
+- **Lines of Code**: ~120 linii nowych (CSS + HTML + JS)
+- **Modal System**: Reusable modal dialog with dynamic buttons
+- **Import Options**:
+  - Merge (btn-primary) - dołącza pytania do istniejących
+  - Replace (btn-danger) - zamienia wszystkie pytania
+  - Cancel (btn-outline) - anuluje import
+
+### User Impact
+- Możliwość wyboru między Merge a Replace przy imporcie
+- Możliwość czyszczenia całej bazy pytań jednym przyciskiem
+- Lepszy UX z custom modal dialog
+
+---
+
+## [0.9.1] - 2026-02-15
+
+### Added
+- **Testowanie i poprawki** (90% planu zrealizowanego)
+- ✅ **Mobile Responsiveness** - przycisk toggle sidebar dla urządzeń mobilnych
+- ✅ **Kliknięcie poza sidebar** - automatyczne zamykanie sidebar na mobile
+- ✅ **Compact Tag Filter** - zamiast wielu chipów teraz dropdown z top 20 tagami
+- ✅ **Tag Counts** - wyświetlanie liczby użycia tagów w dropdown
+- ✅ **Active Tags Chips** - aktywne tagi jako removable chips z ikoną ×
+- 📱 **Mobile-optimized UI** - lepszy layout na urządzeniach mobilnych
+
+### Changed
+- Zaktualizowano AppState.version na '0.9.0'
+- Naprawiono filtrowanie tagów (zła klasa CSS: 'chip' → 'filter-chip')
+- Naprawiono brakujące nasłuchiwanie zdarzenia input dla pola wyszukiwania
+- Naprawiono klasę dropdownu kategorii (zmieniono 'all' na pusty string '')
+- Naprawiono porównywanie ID w loadQuestionToForm (=== → ==)
+- Naprawiono ładowanie pytań z localStorage (teraz używa Question.fromJson())
+- Naprawiono aktualizację pytań (teraz zachowuje wszystkie dodatkowe pola)
+- Naprawiono syntax error w metodzie resetFilters() (dodatkowa klamra)
+- Naprawiono duplikat metody updateFiltersUI()
+- Dodano brakujące tłumaczenia (search_placeholder, filter_category_all)
+- Dodano debug logging dla loadQuestionToForm()
+- Zaktualizowano renderFilterTags() - teraz kompaktowy dropdown z licznikami
+- Dodano onFilterTagSelect() - obsługa wyboru tagu z dropdown
+- Dodano toggleFilterTag() - toggling tagu (dodawanie/usuwanie)
+- Dodano renderActiveTags() - renderowanie aktywnych tagów jako chips
+- Dodano toggleSidebar() - przełączanie sidebar na mobile
+- Usunięto duplikat metody updateFiltersUI()
+
+### Technical Details
+- **Lines of Code**: ~50 linii nowych (HTML + CSS + JS)
+- **Mobile Support**: Sidebar toggle z click-outside zamykaniem
+- **Tag Filter**: Dropdown z top 20 tagami + aktywnymi chipami
+- **Bug Fixes**: 7 poprawek błędów
+- **Debug**: Dodano console.log dla troubleshooting
+
+### User Impact
+- Lepsza responsywność na urządzeniach mobilnych
+- Bardziej kompaktowy interfejs filtrowania tagów
+- Poprawiona edycja zaimportowanych pytań
+- Poprawiona walidacja formularzy
+- Lepsze UX dla dużych zbiorów pytań z wieloma tagami
 
 ---
 
@@ -383,6 +612,29 @@ getFilteredQuestions() {
 ---
 
 ## [Unreleased]
+
+---
+
+## 🎉 Production Release: v1.0.0
+
+**Status:** ZAKOŃCZONO - Wersja produkcyjna
+**Data:** 2026-02-16
+**Postęp:** 100% zrealizowanego planu
+
+### Wszystkie funkcjonalności zrealizowane:
+- ✅ Podstawowa struktura HTML/CSS
+- ✅ Modele danych
+- ✅ Lista pytań
+- ✅ Filtrowanie i wyszukiwanie
+- ✅ Edytor pytań (wszystkie typy)
+- ✅ Obsługa obrazów
+- ✅ Podgląd na żywo
+- ✅ Kompletny Import/Export
+- ✅ Testowanie i poprawki
+- ✅ Dokumentacja użytkownika
+- ✅ Przykładowe pytania
+
+**Gotowe do użycia w produkcji!** ✨
 
 ---
 

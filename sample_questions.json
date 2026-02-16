@@ -1,0 +1,183 @@
+{
+  "version": "2.11.0",
+  "exportDate": "2026-02-16T00:00:00.000Z",
+  "category": "sample",
+  "totalQuestions": 10,
+  "questions": [
+    {
+      "id": "1700000001001",
+      "type": "single",
+      "text": "What is the capital of France?",
+      "category": "Geography",
+      "tags": ["europe", "capitals", "countries"],
+      "explanation": "Paris has been the capital of France since 987 AD.",
+      "imageData": "",
+      "options": [
+        "London",
+        "Paris",
+        "Berlin",
+        "Madrid"
+      ],
+      "correct": [2],
+      "difficulty": 1
+    },
+    {
+      "id": "1700000001002",
+      "type": "multiple",
+      "text": "Which of the following are primary colors?",
+      "category": "Art",
+      "tags": ["colors", "theory", "basics"],
+      "explanation": "In traditional color theory, red, yellow, and blue are the primary colors.",
+      "imageData": "",
+      "options": [
+        "Red",
+        "Green",
+        "Yellow",
+        "Blue",
+        "Orange"
+      ],
+      "correct": [1, 3, 4],
+      "difficulty": 2
+    },
+    {
+      "id": "1700000001003",
+      "type": "ordering",
+      "text": "Order the planets from closest to the sun to furthest:",
+      "category": "Astronomy",
+      "tags": ["planets", "solar-system", "space"],
+      "explanation": "The order is: Mercury, Venus, Earth, Mars, Jupiter.",
+      "imageData": "",
+      "options": [
+        "Earth",
+        "Mars",
+        "Mercury",
+        "Venus",
+        "Jupiter"
+      ],
+      "correct": [3, 4, 1, 2, 5],
+      "difficulty": 3
+    },
+    {
+      "id": "1700000001004",
+      "type": "pairing",
+      "text": "Match the countries with their capitals:",
+      "category": "Geography",
+      "tags": ["capitals", "countries", "world"],
+      "explanation": "These are some of the most well-known capital cities in the world.",
+      "imageData": "",
+      "pairs": [
+        {"left": "Japan", "right": "Tokyo"},
+        {"left": "Italy", "right": "Rome"},
+        {"left": "Brazil", "right": "Brasilia"},
+        {"left": "Australia", "right": "Canberra"}
+      ],
+      "options": [],
+      "correct": [],
+      "difficulty": 2
+    },
+    {
+      "id": "1700000001005",
+      "type": "single",
+      "text": "What is the chemical symbol for gold?",
+      "category": "Chemistry",
+      "tags": ["elements", "symbols", "science"],
+      "explanation": "Gold is represented by the symbol Au, from the Latin word 'aurum'.",
+      "imageData": "",
+      "options": [
+        "Go",
+        "Gd",
+        "Au",
+        "Ag"
+      ],
+      "correct": [3],
+      "difficulty": 2
+    },
+    {
+      "id": "1700000001006",
+      "type": "multiple",
+      "text": "Which of these are programming languages?",
+      "category": "Technology",
+      "tags": ["programming", "coding", "software"],
+      "explanation": "Python, JavaScript, and Java are all popular programming languages.",
+      "imageData": "",
+      "options": [
+        "Python",
+        "HTML",
+        "JavaScript",
+        "Java",
+        "CSS"
+      ],
+      "correct": [1, 3, 4],
+      "difficulty": 1
+    },
+    {
+      "id": "1700000001007",
+      "type": "ordering",
+      "text": "Order these events in the correct historical sequence:",
+      "category": "History",
+      "tags": ["history", "events", "timeline"],
+      "explanation": "The correct chronological order is: First moon landing, Fall of Berlin Wall, 9/11 attacks.",
+      "imageData": "",
+      "options": [
+        "Fall of Berlin Wall (1989)",
+        "First moon landing (1969)",
+        "September 11 attacks (2001)"
+      ],
+      "correct": [2, 1, 3],
+      "difficulty": 3
+    },
+    {
+      "id": "1700000001008",
+      "type": "pairing",
+      "text": "Match the animals with their sounds:",
+      "category": "Nature",
+      "tags": ["animals", "sounds", "nature"],
+      "explanation": "These are common animal sounds in English.",
+      "imageData": "",
+      "pairs": [
+        {"left": "Dog", "right": "Bark"},
+        {"left": "Cat", "right": "Meow"},
+        {"left": "Cow", "right": "Moo"},
+        {"left": "Bird", "right": "Tweet"}
+      ],
+      "options": [],
+      "correct": [],
+      "difficulty": 1
+    },
+    {
+      "id": "1700000001009",
+      "type": "single",
+      "text": "What is the largest ocean on Earth?",
+      "category": "Geography",
+      "tags": ["oceans", "water", "earth"],
+      "explanation": "The Pacific Ocean is the largest and deepest ocean on Earth.",
+      "imageData": "",
+      "options": [
+        "Atlantic Ocean",
+        "Indian Ocean",
+        "Pacific Ocean",
+        "Arctic Ocean"
+      ],
+      "correct": [3],
+      "difficulty": 1
+    },
+    {
+      "id": "1700000001010",
+      "type": "multiple",
+      "text": "Which of these are continents?",
+      "category": "Geography",
+      "tags": ["continents", "world", "geography"],
+      "explanation": "Asia, Africa, and Europe are three of the seven continents on Earth.",
+      "imageData": "",
+      "options": [
+        "Asia",
+        "Greenland",
+        "Africa",
+        "Europe",
+        "Australia"
+      ],
+      "correct": [1, 3, 4, 5],
+      "difficulty": 2
+    }
+  ]
+}
