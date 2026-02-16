@@ -2636,36 +2636,6 @@
                     totalBytes: usedBytes
                 };
             }
-                    console.error('localStorage save error:', error);
-
-                    // User-friendly error message
-                    const t = Translations[AppState.language];
-                    const isQuotaError = error.name === 'QuotaExceededError' ||
-                                        error.code === 22 ||
-                                        error.code === 1014 ||
-                                        error.name === 'NS_ERROR_DOM_QUOTA_REACHED';
-
-                    if (isQuotaError) {
-                        this.showModal(
-                            'Brak miejsca w localStorage!',
-                            'Masz za dużo pytań w pamięci przeglądarki. <br><br><b>Rozwiązania:</b>' +
-                            '<ol style="text-align: left; margin-left: 20px;">' +
-                            '<li><b>Wyczyść stare dane:</b> Użyj DevTools (F12) → Application → Local Storage → usuń klucz "questions"</li>' +
-                            '<li><b>Tryb Incognito:</b> Otwórz edytor w nowym oknie incognito (pusta pamięć)</li>' +
-                            '<li><b>Eksportuj starsze pytania:</b> Zapisz je do pliku i usuń z edytora</li>' +
-                            '</ol>',
-                            '',
-                            [{
-                                text: 'Zrozumiałem',
-                                className: 'btn-primary',
-                                action: () => {}
-                            }]
-                        );
-                    } else {
-                        this.showToast('error', t.toast_error, 'Błąd zapisu: ' + error.message);
-                    }
-                }
-            }
 
             // ==================== UI UPDATES ====================
             updateUI() {
