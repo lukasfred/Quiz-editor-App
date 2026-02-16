@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Quiz Question Editor - Create and edit quiz questions compatible with Android app v2.11.2+">
-    <title>Quiz Question Editor v1.0.0</title>
+    <title>Quiz Question Editor v1.0.2</title>
 
     <style>
         /* ==================== CSS VARIABLES ==================== */
@@ -1457,7 +1457,7 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1 class="sidebar-title">Quiz Editor</h1>
-                    <span class="sidebar-version">v1.0.0</span>
+                    <span class="sidebar-version">v1.0.2</span>
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -1801,7 +1801,7 @@
                     <div class="card-header">
                         <h2 class="card-title">Pomoc</h2>
                     </div>
-                    <h3>Quiz Question Editor v1.0.0</h3>
+                    <h3>Quiz Question Editor v1.0.2</h3>
                     <p>
                         Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.
                     </p>
@@ -1850,7 +1850,7 @@
         const AppState = {
             currentPage: 'questions',
             questions: [],
-            version: '1.0.0',
+            version: '1.0.2',
             currentPageIndex: 0,
             itemsPerPage: 50,
             language: 'pl',
@@ -1971,7 +1971,7 @@
                  
                   // Help page
                   help_title: 'Pomoc',
-                  app_version: 'Quiz Question Editor v1.0.0',
+                  app_version: 'Quiz Question Editor v1.0.2',
                   app_desc: 'Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.',
                 supported_types: 'Obsługiwane typy pytań:',
                 type_single_desc: 'jedna poprawna odpowiedź',
@@ -2102,10 +2102,10 @@
                  clipboard_copy_failed: 'Failed to copy to clipboard.',
                  clipboard_read_failed: 'Failed to read from clipboard.',
                   
-                  // Help page
-                  help_title: 'Help',
-                  app_version: 'Quiz Question Editor v1.0.0',
-                  app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
+                   // Help page
+                   help_title: 'Help',
+                   app_version: 'Quiz Question Editor v1.0.2',
+                   app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
                 supported_types: 'Supported question types:',
                 type_single_desc: 'one correct answer',
                 type_multiple_desc: 'multiple correct answers',
@@ -2217,7 +2217,8 @@
                 } else {
                     // For single/multiple/ordering, export options and correct
                     json.options = this.options;
-                    json.correct = this.correct; // 1-based indices
+                    // Export correct as text (Android format) - convert indices to text
+                    json.correct = this.correct.map(idx => this.options[idx - 1]);
                 }
 
                 return json;
@@ -2235,7 +2236,17 @@
                 const options = json.options || [];
 
                 // Parse correct - can be indices (numbers) or text (strings)
-                const correct = json.correct || [];
+                let correct = json.correct || [];
+
+                // Convert text-based correct answers to indices
+                if (correct.length > 0 && typeof correct[0] === 'string') {
+                    correct = correct
+                        .map(text => {
+                            const index = options.indexOf(text);
+                            return index >= 0 ? index + 1 : null;
+                        })
+                        .filter(idx => idx !== null);
+                }
 
                 return new Question({
                     id: String(json.id),
@@ -2393,7 +2404,7 @@
             }
 
             init() {
-                console.log('Quiz Question Editor v1.0.0 - Initializing...');
+                console.log('Quiz Question Editor v1.0.2 - Initializing...');
 
                 // Load language preference
                 const savedLang = localStorage.getItem('language');
@@ -4398,7 +4409,7 @@
         // ==================== INITIALIZE APP ====================
         const app = new QuizEditorApp();
 
-        console.log('Quiz Question Editor v1.0.0 loaded successfully!');
+        console.log('Quiz Question Editor v1.0.2 loaded successfully!');
         console.log('Language:', AppState.language);
         console.log('Progress: 100% of implementation plan - PRODUCTION READY ✨');
     </script>
