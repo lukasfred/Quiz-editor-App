@@ -6,6 +6,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.4] - 2026-02-16
+
+### Fixed
+- 🔧 **Smart quotes normalization** - Aplikacja automatycznie naprawia "smart quotes"
+- Dodano funkcję `Helpers.normalizeQuotes()` do konwersji Unicode quotes na ASCII
+- Automatyczna normalizacja przy imporcie i eksporcie:
+  - Single smart quotes: `''` (U+2018, U+2019) → `'` (ASCII)
+  - Double smart quotes: `""` (U+201C, U+201D, U+2033, U+2036) → `"` (ASCII)
+
+### Improved
+- 🛡️ **JSON compatibility** - Eksport jest teraz w 100% zgodny z Android
+- Normalizacja odbywa się automatycznie we wszystkich polach tekstowych:
+  - `text`, `category`, `tags`, `explanation`, `options`, `correct`, `pairs`
+- Aplikacja Android prawidłowo interpretuje wyeksportowane pliki
+- Opcje nie są już dzielone przez smart quotes (problem z 6 opcjami → 10 opcjami)
+
+### Technical Details
+- Dodano do Helpers:
+  - `normalizeQuotes(text)` - konwertuje smart quotes na ASCII
+  - `escapeQuotes(text)` - ucieczka cudzysłów (dla przyszłego użycia)
+- Zmodyfikowano Question.toJson():
+  - Normalizuje wszystkie pola tekstowe przed eksportem
+- Zmodyfikowano Question.fromJson():
+  - Normalizuje wszystkie pola tekstowe przy imporcie
+  - Automatycznie dopasowuje tekst w `correct` do znormalizowanych opcji
+- Zmodyfikowano PairItem:
+  - toJson() i fromJson() również normalizują teksty
+- Obsługiwane kody Unicode smart quotes:
+  - `\u2018` - Left single quotation mark (')
+  - `\u2019` - Right single quotation mark (')
+  - `\u201C` - Left double quotation mark (")
+  - `\u201D` - Right double quotation mark (")
+  - `\u2033` - Double prime (")
+  - `\u2036` - Reversed double prime (")
+
+### User Impact
+- ✅ Import plików z Android z smart quotes teraz działa poprawnie
+- ✅ Export do Android tworzy poprawny JSON (ASCII quotes)
+- ✅ Opcje nie są dzielone (6 opcji zostaje 6 opcjami)
+- ✅ Wszystkie pytania z automatycznej korekcji można używać w Android
+
+---
+
 ## [1.0.3] - 2026-02-16
 
 ### Fixed

@@ -488,7 +488,7 @@ W razie pytań lub problemów:
 
 ---
 
-**Wersja aplikacji:** v1.0.3 ✨
+**Wersja aplikacji:** v1.0.4 ✨
 **Data:** 2026-02-16
 **Postęp implementacji:** 100%
 **Status:** Wersja produkcyjna

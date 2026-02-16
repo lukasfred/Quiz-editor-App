@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Quiz Question Editor - Create and edit quiz questions compatible with Android app v2.11.2+">
-    <title>Quiz Question Editor v1.0.3</title>
+    <title>Quiz Question Editor v1.0.4</title>
 
     <style>
         /* ==================== CSS VARIABLES ==================== */
@@ -1457,7 +1457,7 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1 class="sidebar-title">Quiz Editor</h1>
-                    <span class="sidebar-version">v1.0.3</span>
+                    <span class="sidebar-version">v1.0.4</span>
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -1801,7 +1801,7 @@
                     <div class="card-header">
                         <h2 class="card-title">Pomoc</h2>
                     </div>
-                    <h3>Quiz Question Editor v1.0.3</h3>
+                    <h3>Quiz Question Editor v1.0.4</h3>
                     <p>
                         Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.
                     </p>
@@ -1850,7 +1850,7 @@
         const AppState = {
             currentPage: 'questions',
             questions: [],
-            version: '1.0.3',
+            version: '1.0.4',
             currentPageIndex: 0,
             itemsPerPage: 50,
             language: 'pl',
@@ -1971,7 +1971,7 @@
                  
                   // Help page
                   help_title: 'Pomoc',
-                  app_version: 'Quiz Question Editor v1.0.3',
+                  app_version: 'Quiz Question Editor v1.0.4',
                   app_desc: 'Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.',
                 supported_types: 'Obsługiwane typy pytań:',
                 type_single_desc: 'jedna poprawna odpowiedź',
@@ -2104,7 +2104,7 @@
                   
                    // Help page
                    help_title: 'Help',
-                   app_version: 'Quiz Question Editor v1.0.3',
+                   app_version: 'Quiz Question Editor v1.0.4',
                    app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
                 supported_types: 'Supported question types:',
                 type_single_desc: 'one correct answer',
@@ -2191,14 +2191,14 @@
                 const json = {
                     id: this.id,
                     type: this.type,
-                    text: this.text,
-                    category: this.category,
-                    tags: this.tags,
+                    text: Helpers.normalizeQuotes(this.text),
+                    category: Helpers.normalizeQuotes(this.category),
+                    tags: this.tags.map(tag => Helpers.normalizeQuotes(tag)),
                     difficulty: this.difficulty
                 };
 
                 if (this.explanation) {
-                    json.explanation = this.explanation;
+                    json.explanation = Helpers.normalizeQuotes(this.explanation);
                 }
 
                 if (this.imageData) {
@@ -2216,9 +2216,10 @@
                     json.correct = [];
                 } else {
                     // For single/multiple/ordering, export options and correct
-                    json.options = this.options;
+                    // Normalize quotes in options
+                    json.options = this.options.map(opt => Helpers.normalizeQuotes(opt));
                     // Export correct as text (Android format) - convert indices to text
-                    json.correct = this.correct.map(idx => this.options[idx - 1]);
+                    json.correct = this.correct.map(idx => Helpers.normalizeQuotes(this.options[idx - 1]));
                 }
 
                 return json;
@@ -2232,14 +2233,17 @@
                     pairs = json.pairs.map(p => PairItem.fromJson(p));
                 }
 
-                // Parse options
-                const options = json.options || [];
+                // Parse options and normalize quotes
+                const options = (json.options || []).map(opt => Helpers.normalizeQuotes(opt));
 
                 // Parse correct - can be indices (numbers) or text (strings)
                 let correct = json.correct || [];
 
-                // Convert text-based correct answers to indices
+                // Normalize quotes in correct field if it's text
                 if (correct.length > 0 && typeof correct[0] === 'string') {
+                    correct = correct.map(text => Helpers.normalizeQuotes(text));
+                    
+                    // Convert text-based correct answers to indices
                     correct = correct
                         .map(text => {
                             const index = options.indexOf(text);
@@ -2251,13 +2255,13 @@
                 return new Question({
                     id: String(json.id),
                     type: json.type,
-                    text: json.text,
-                    explanation: json.explanation || '',
+                    text: Helpers.normalizeQuotes(json.text),
+                    explanation: Helpers.normalizeQuotes(json.explanation || ''),
                     options: options,
                     correct: correct,
                     pairs: pairs,
-                    category: json.category || '',
-                    tags: json.tags || [],
+                    category: Helpers.normalizeQuotes(json.category || ''),
+                    tags: (json.tags || []).map(tag => Helpers.normalizeQuotes(tag)),
                     imageData: json.imageData || '',
                     difficulty: json.difficulty || 1,
                     markedForReview: json.markedForReview || false
@@ -2274,15 +2278,15 @@
 
             toJson() {
                 return {
-                    left: this.left,
-                    right: this.right
+                    left: Helpers.normalizeQuotes(this.left),
+                    right: Helpers.normalizeQuotes(this.right)
                 };
             }
 
             static fromJson(json) {
                 return new PairItem({
-                    left: json.left || '',
-                    right: json.right || ''
+                    left: Helpers.normalizeQuotes(json.left || ''),
+                    right: Helpers.normalizeQuotes(json.right || '')
                 });
             }
 
@@ -2321,6 +2325,28 @@
             // Convert all indices in array from 1-based to 0-based
             convertToZeroBased(indices) {
                 return indices.map(i => this.toZeroBased(i));
+            },
+
+            // Normalize smart quotes to ASCII quotes
+            // Converts "smart quotes" (Unicode) to standard ASCII quotes
+            normalizeQuotes(text) {
+                if (!text || typeof text !== 'string') return text;
+                
+                // Replace smart quotes (Unicode) with ASCII quotes
+                return text
+                    .replace(/[\u2018\u2019]/g, "'")      // 'smart' single quotes → '
+                    .replace(/[\u201C\u201D\u2033\u2036]/g, '"');  // "smart" double quotes → "
+            },
+
+            // Escape quotes in text for JSON
+            escapeQuotes(text) {
+                if (!text || typeof text !== 'string') return text;
+                
+                // First normalize smart quotes to ASCII
+                const normalized = this.normalizeQuotes(text);
+                
+                // Then escape quotes for JSON
+                return normalized.replace(/"/g, '\\"');
             },
 
             // Validate question type
@@ -2404,7 +2430,7 @@
             }
 
             init() {
-                console.log('Quiz Question Editor v1.0.3 - Initializing...');
+                console.log('Quiz Question Editor v1.0.4 - Initializing...');
 
                 // Load language preference
                 const savedLang = localStorage.getItem('language');
@@ -4425,7 +4451,7 @@
         // ==================== INITIALIZE APP ====================
         const app = new QuizEditorApp();
 
-        console.log('Quiz Question Editor v1.0.3 loaded successfully!');
+        console.log('Quiz Question Editor v1.0.4 loaded successfully!');
         console.log('Language:', AppState.language);
         console.log('Progress: 100% of implementation plan - PRODUCTION READY ✨');
     </script>
