@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Quiz Question Editor - Create and edit quiz questions compatible with Android app v2.11.2+">
-    <title>Quiz Question Editor v1.0.4</title>
+    <title>Quiz Question Editor v1.0.5</title>
 
     <style>
         /* ==================== CSS VARIABLES ==================== */
@@ -1801,7 +1801,7 @@
                     <div class="card-header">
                         <h2 class="card-title">Pomoc</h2>
                     </div>
-                    <h3>Quiz Question Editor v1.0.4</h3>
+                    <h3>Quiz Question Editor v1.0.5</h3>
                     <p>
                         Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.
                     </p>
@@ -1971,7 +1971,7 @@
                  
                   // Help page
                   help_title: 'Pomoc',
-                  app_version: 'Quiz Question Editor v1.0.4',
+                  app_version: 'Quiz Question Editor v1.0.5',
                   app_desc: 'Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.',
                 supported_types: 'Obsługiwane typy pytań:',
                 type_single_desc: 'jedna poprawna odpowiedź',
@@ -2104,7 +2104,7 @@
                   
                    // Help page
                    help_title: 'Help',
-                   app_version: 'Quiz Question Editor v1.0.4',
+                   app_version: 'Quiz Question Editor v1.0.5',
                    app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
                 supported_types: 'Supported question types:',
                 type_single_desc: 'one correct answer',
@@ -2430,7 +2430,7 @@
             }
 
             init() {
-                console.log('Quiz Question Editor v1.0.4 - Initializing...');
+                console.log('Quiz Question Editor v1.0.5 - Initializing...');
 
                 // Load language preference
                 const savedLang = localStorage.getItem('language');
@@ -2570,8 +2570,101 @@
             }
 
             saveQuestions() {
-                localStorage.setItem('questions', JSON.stringify(AppState.questions));
-                this.updateExportCategoryDropdown();
+                try {
+                    const questionsJson = JSON.stringify(AppState.questions);
+
+                    // Check estimated size before saving (rough estimate: 2 bytes per char)
+                    const estimatedSize = new Blob([questionsJson]).size;
+                    console.log(`Saving ${AppState.questions.length} questions (~${(estimatedSize / 1024).toFixed(2)} KB)`);
+
+                    // Try to save with error handling
+                    localStorage.setItem('questions', questionsJson);
+                    this.updateExportCategoryDropdown();
+                } catch (error) {
+                    console.error('localStorage save error:', error);
+
+                    // User-friendly error message
+                    const t = Translations[AppState.language];
+                    const isQuotaError = error.name === 'QuotaExceededError' ||
+                                        error.code === 22 ||
+                                        error.code === 1014 ||
+                                        error.name === 'NS_ERROR_DOM_QUOTA_REACHED';
+
+                    if (isQuotaError) {
+                        this.showModal(
+                            'Brak miejsca w localStorage!',
+                            'Masz za dużo pytań w pamięci przeglądarki. <br><br><b>Rozwiązania:</b>' +
+                            '<ol style="text-align: left; margin-left: 20px;">' +
+                            '<li><b>Wyczyść stare dane:</b> Użyj DevTools (F12) → Application → Local Storage → usuń klucz "questions"</li>' +
+                            '<li><b>Tryb Incognito:</b> Otwórz edytor w nowym oknie incognito (pusta pamięć)</li>' +
+                            '<li><b>Eksportuj starsze pytania:</b> Zapisz je do pliku i usuń z edytora</li>' +
+                            '</ol>',
+                            '',
+                            [{
+                                text: 'Zrozumiałem',
+                                className: 'btn-primary',
+                                action: () => {}
+                            }]
+                        );
+                    } else {
+                        this.showToast('error', t.toast_error, 'Błąd zapisu: ' + error.message);
+                    }
+                }
+            }
+
+            // Check localStorage usage and return info
+            checkLocalStorageSpace() {
+                let total = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        total += localStorage[key].length + key.length;
+                    }
+                }
+                // Rough estimate: 2 bytes per character
+                const usedBytes = total * 2;
+                const usedKB = (usedBytes / 1024).toFixed(2);
+
+                // Most browsers have 5-10 MB limit
+                const estimatedLimitKB = 5120; // 5 MB
+                const availableKB = (estimatedLimitKB - usedKB).toFixed(2);
+                const usagePercent = ((usedKB / estimatedLimitKB) * 100).toFixed(1);
+
+                return {
+                    usedKB,
+                    availableKB,
+                    usagePercent,
+                    totalBytes: usedBytes
+                };
+            }
+                    console.error('localStorage save error:', error);
+
+                    // User-friendly error message
+                    const t = Translations[AppState.language];
+                    const isQuotaError = error.name === 'QuotaExceededError' ||
+                                        error.code === 22 ||
+                                        error.code === 1014 ||
+                                        error.name === 'NS_ERROR_DOM_QUOTA_REACHED';
+
+                    if (isQuotaError) {
+                        this.showModal(
+                            'Brak miejsca w localStorage!',
+                            'Masz za dużo pytań w pamięci przeglądarki. <br><br><b>Rozwiązania:</b>' +
+                            '<ol style="text-align: left; margin-left: 20px;">' +
+                            '<li><b>Wyczyść stare dane:</b> Użyj DevTools (F12) → Application → Local Storage → usuń klucz "questions"</li>' +
+                            '<li><b>Tryb Incognito:</b> Otwórz edytor w nowym oknie incognito (pusta pamięć)</li>' +
+                            '<li><b>Eksportuj starsze pytania:</b> Zapisz je do pliku i usuń z edytora</li>' +
+                            '</ol>',
+                            '',
+                            [{
+                                text: 'Zrozumiałem',
+                                className: 'btn-primary',
+                                action: () => {}
+                            }]
+                        );
+                    } else {
+                        this.showToast('error', t.toast_error, 'Błąd zapisu: ' + error.message);
+                    }
+                }
             }
 
             // ==================== UI UPDATES ====================
@@ -4288,6 +4381,42 @@
 
                 const importCount = validation.questions.length;
 
+                // Check localStorage space before import (warn if > 80% used)
+                const spaceInfo = this.checkLocalStorageSpace();
+                console.log(`LocalStorage: ${spaceInfo.usedKB} KB used (${spaceInfo.usagePercent}%)`);
+
+                // If localStorage is nearly full, show warning
+                if (parseFloat(spaceInfo.usagePercent) > 80) {
+                    this.showModal(
+                        'Ostrzeżenie: localStorage jest prawie pełne!',
+                        `Użyto ${spaceInfo.usedKB} KB z ~5120 KB (${spaceInfo.usagePercent}%).<br><br>` +
+                        `Import ${importCount} pytań może przekroczyć limit.<br><br><b>Zalecane:</b><br>` +
+                        `• Wybierz "Replace (Zamień)" zamiast "Merge"<br>` +
+                        `• Albo wyczyść localStorage przed importem (F12 → Application → Local Storage)`,
+                        '',
+                        [{
+                            text: 'Kontynuuj',
+                            className: 'btn-primary',
+                            action: () => {
+                                this.proceedWithImport(validation.questions, importCount, t);
+                            }
+                        }, {
+                            text: 'Anuluj',
+                            className: 'btn-outline',
+                            action: () => {
+                                this.showToast('warning', t.toast_warning, t.import_cancelled);
+                                document.getElementById('import-file').value = '';
+                            }
+                        }]
+                    )
+                    return;
+                }
+
+                // Proceed with import logic (called from handleImport and warning modal)
+                this.proceedWithImport(validation.questions, importCount, t);
+            }
+
+            proceedWithImport(questions, importCount, t) {
                 if (AppState.questions.length > 0 && importCount > 0) {
                     // Show custom modal with Merge/Replace/Cancel options
                     this.showModal(
@@ -4298,18 +4427,20 @@
                                 text: 'Merge (Dołącz)',
                                 className: 'btn-primary',
                                 action: () => {
-                                    this.mergeQuestions(validation.questions);
+                                    this.mergeQuestions(questions);
                                     this.showToast('success', t.toast_success, t.import_merge_success.replace('{count}', importCount));
+                                    document.getElementById('import-file').value = '';
                                 }
                             },
                             {
                                 text: 'Replace (Zamień)',
                                 className: 'btn-danger',
                                 action: () => {
-                                    AppState.questions = validation.questions;
+                                    AppState.questions = questions;
                                     this.saveQuestions();
                                     this.updateUI();
                                     this.showToast('success', t.toast_success, t.import_merge_success.replace('{count}', importCount));
+                                    document.getElementById('import-file').value = '';
                                 }
                             },
                             {
@@ -4317,18 +4448,18 @@
                                 className: 'btn-outline',
                                 action: () => {
                                     this.showToast('warning', t.toast_warning, t.import_cancelled);
+                                    document.getElementById('import-file').value = '';
                                 }
                             }
                         ]
                     );
                 } else {
-                    AppState.questions = validation.questions;
+                    AppState.questions = questions;
                     this.saveQuestions();
                     this.updateUI();
                     this.showToast('success', t.toast_success, t.import_success.replace('{count}', importCount));
+                    document.getElementById('import-file').value = '';
                 }
-
-                document.getElementById('import-file').value = '';
             }
 
             validateImportData(data) {
@@ -4451,7 +4582,7 @@
         // ==================== INITIALIZE APP ====================
         const app = new QuizEditorApp();
 
-        console.log('Quiz Question Editor v1.0.4 loaded successfully!');
+        console.log('Quiz Question Editor v1.0.5 loaded successfully!');
         console.log('Language:', AppState.language);
         console.log('Progress: 100% of implementation plan - PRODUCTION READY ✨');
     </script>
