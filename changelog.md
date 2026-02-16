@@ -6,6 +6,69 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.3] - 2026-02-16
+
+### Fixed
+- 🔧 **Search functionality** - Wyszukiwarka nie działała
+- Dodano brakujący event handler `oninput="app.onFilterSearchChange(event)"` do pola wyszukiwania
+- Teraz wpisanie tekstu w polu "Szukaj" poprawnie filtruje pytania
+
+### Changed
+- 🔄 **Reset filters behavior** - Przycisk "Reset filtrów" teraz wraca do pierwszej strony
+- Zmieniono `resetFilters()` aby resetować `currentPageIndex` do 0 i wywoływać `updateUI()`
+- Wszystkie funkcje filtrujące teraz resetują `currentPageIndex` do 0:
+  - `onFilterSearchChange()` - wyszukiwanie
+  - `onFilterTypeChange()` - filtr typu
+  - `onFilterCategoryChange()` - filtr kategorii
+  - `onAddTag()` / `onRemoveTag()` - tagi
+  - `toggleFilterTag()` / `removeFilterTag()` - tagi w filtrach
+- Dodano `renderPagination()` do wszystkich funkcji filtrujących dla aktualizacji nawigacji
+
+### Technical Details
+- Dodano event listener do pola input search (line 1546)
+- Zmodyfikowano 7 funkcji: resetFilters(), onFilterSearchChange(), onFilterTypeChange(), onFilterCategoryChange(), onAddTag(), onRemoveTag(), toggleFilterTag(), removeFilterTag()
+- Wszystkie operacje filtrowania teraz zawsze:
+  1. Resetują `currentPageIndex` do 0
+  2. Wywołują `renderPagination()` dla aktualizacji stron
+  3. Utrzymują spójność między filtrowaniem a paginacją
+
+---
+
+## [1.0.2] - 2026-02-16
+
+### Changed
+- 🔄 **Export format** - Zmieniono format eksportu na zgodny z Android app
+- Eksportuje teraz tekst odpowiedzi zamiast indeksów w polu `correct`
+- Format Android: `"correct": ["System messages"]` zamiast `"correct": [3]`
+- Zapewnia pełną kompatybilność z aplikacją Android v2.11.2+
+- Zaktualizowano dokumentację README.md zgodnie z rzeczywistym formatem
+
+### Technical Details
+- Zmodyfikowano metodę `toJson()` w pliku index.html
+- `json.correct = this.correct.map(idx => this.options[idx - 1])` - konwersja indeksów na tekst
+- Import nadal obsługuje oba formaty (tekst + indeksy) dla kompatybilności wstecznej
+- Eksport jest teraz w 100% zgodny z formatem Android
+
+---
+
+## [1.0.1] - 2026-02-16
+
+### Fixed
+- 🔧 **Import bugfix** - Correct answers not being read from imported JSON files
+- Aplikacja nie potrafiła odczytać poprawnych odpowiedzi z plików JSON, w których pole `correct` zawierało tekst zamiast indeksów
+- Dodano automatyczną konwersję tekstów odpowiedzi na indeksy w metodzie `Question.fromJson()`
+- Teraz aplikacja poprawnie obsługuje oba formaty:
+  - Indeksy: `"correct": [1]` (stary format)
+  - Tekst: `"correct": ["System messages"]` (format z Android app)
+
+### Technical Details
+- Zmodyfikowano metodę `Question.fromJson()` w pliku index.html
+- Dodano logikę wykrywania typu danych w polu `correct` (string vs number)
+- Automatyczna konwersja: tekst → indeks w tablicy `options` (+1 dla 1-based indexing)
+- Poprawa kompatybilności z importem pytań z aplikacji Android
+
+---
+
 ## [1.0.0] - 2026-02-16
 
 ### Added

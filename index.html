@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Quiz Question Editor - Create and edit quiz questions compatible with Android app v2.11.2+">
-    <title>Quiz Question Editor v1.0.2</title>
+    <title>Quiz Question Editor v1.0.3</title>
 
     <style>
         /* ==================== CSS VARIABLES ==================== */
@@ -1457,7 +1457,7 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1 class="sidebar-title">Quiz Editor</h1>
-                    <span class="sidebar-version">v1.0.2</span>
+                    <span class="sidebar-version">v1.0.3</span>
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -1543,7 +1543,7 @@
                     <div class="filters-toolbar">
                          <div class="filter-group">
                              <label class="filter-label">🔍 Szukaj</label>
-                             <input type="text" class="form-control filter-search" id="filter-search" placeholder="Szukaj...">
+                              <input type="text" class="form-control filter-search" id="filter-search" placeholder="Szukaj..." oninput="app.onFilterSearchChange(event)">
                          </div>
                         <div class="filter-group">
                             <label class="filter-label">📋 Typ</label>
@@ -1801,7 +1801,7 @@
                     <div class="card-header">
                         <h2 class="card-title">Pomoc</h2>
                     </div>
-                    <h3>Quiz Question Editor v1.0.2</h3>
+                    <h3>Quiz Question Editor v1.0.3</h3>
                     <p>
                         Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.
                     </p>
@@ -1850,7 +1850,7 @@
         const AppState = {
             currentPage: 'questions',
             questions: [],
-            version: '1.0.2',
+            version: '1.0.3',
             currentPageIndex: 0,
             itemsPerPage: 50,
             language: 'pl',
@@ -1971,7 +1971,7 @@
                  
                   // Help page
                   help_title: 'Pomoc',
-                  app_version: 'Quiz Question Editor v1.0.2',
+                  app_version: 'Quiz Question Editor v1.0.3',
                   app_desc: 'Aplikacja do tworzenia i edycji pytań quizowych, w pełni zgodna z aplikacją Android v2.11.2+.',
                 supported_types: 'Obsługiwane typy pytań:',
                 type_single_desc: 'jedna poprawna odpowiedź',
@@ -2104,7 +2104,7 @@
                   
                    // Help page
                    help_title: 'Help',
-                   app_version: 'Quiz Question Editor v1.0.2',
+                   app_version: 'Quiz Question Editor v1.0.3',
                    app_desc: 'Application for creating and editing quiz questions, fully compatible with Android app v2.11.2+.',
                 supported_types: 'Supported question types:',
                 type_single_desc: 'one correct answer',
@@ -2404,7 +2404,7 @@
             }
 
             init() {
-                console.log('Quiz Question Editor v1.0.2 - Initializing...');
+                console.log('Quiz Question Editor v1.0.3 - Initializing...');
 
                 // Load language preference
                 const savedLang = localStorage.getItem('language');
@@ -2564,7 +2564,8 @@
                 AppState.filterType = 'all';
                 AppState.filterCategory = '';
                 AppState.filterTags = [];
-                this.renderQuestions();
+                AppState.currentPageIndex = 0;
+                this.updateUI();
             }
 
             // ==================== UPDATE FILTERS UI ====================
@@ -2575,6 +2576,7 @@
                 const searchInput = document.getElementById('filter-search');
                 if (searchInput) {
                     searchInput.placeholder = t.search_placeholder;
+                    searchInput.value = AppState.filterSearch;
                 }
 
                 // Update type dropdown
@@ -3876,7 +3878,9 @@
             onFilterSearchChange(event) {
                 const searchValue = event.target.value.trim();
                 AppState.filterSearch = searchValue;
+                AppState.currentPageIndex = 0;
                 this.renderQuestions();
+                this.renderPagination();
                 console.log(`Filter search: "${searchValue}"`);
             }
 
@@ -3884,7 +3888,9 @@
                 if (!event || !event.target) return;
                 const typeValue = event.target.value;
                 AppState.filterType = typeValue;
+                AppState.currentPageIndex = 0;
                 this.renderQuestions();
+                this.renderPagination();
                 console.log(`Filter type: "${typeValue}"`);
             }
 
@@ -3892,23 +3898,29 @@
                 if (!event || !event.target) return;
                 const categoryValue = event.target.value;
                 AppState.filterCategory = categoryValue;
+                AppState.currentPageIndex = 0;
                 this.renderQuestions();
+                this.renderPagination();
                 console.log(`Filter category: "${categoryValue}"`);
             }
 
             onAddTag(tag) {
                 if (!AppState.filterTags.includes(tag)) {
                     AppState.filterTags.push(tag);
+                    AppState.currentPageIndex = 0;
                     this.renderFilterTags();
                     this.renderQuestions();
+                    this.renderPagination();
                 console.log(`Tag added: ${tag}`);
                 }
             }
 
             onRemoveTag(tag) {
                 AppState.filterTags = AppState.filterTags.filter(t => t !== tag);
+                AppState.currentPageIndex = 0;
                 this.renderFilterTags();
                 this.renderQuestions();
+                this.renderPagination();
                 console.log(`Tag removed: ${tag}`);
             }
 
@@ -3918,17 +3930,21 @@
                 } else {
                     AppState.filterTags.push(tag);
                 }
+                AppState.currentPageIndex = 0;
                 this.renderFilterTags();
                 this.renderActiveTags();
                 this.renderQuestions();
+                this.renderPagination();
                 console.log(`Tag toggled: ${tag}`);
             }
 
             removeFilterTag(tag) {
                 AppState.filterTags = AppState.filterTags.filter(t => t !== tag);
+                AppState.currentPageIndex = 0;
                 this.renderFilterTags();
                 this.renderActiveTags();
                 this.renderQuestions();
+                this.renderPagination();
                 console.log(`Filter tag removed: ${tag}`);
             }
 
@@ -4409,7 +4425,7 @@
         // ==================== INITIALIZE APP ====================
         const app = new QuizEditorApp();
 
-        console.log('Quiz Question Editor v1.0.2 loaded successfully!');
+        console.log('Quiz Question Editor v1.0.3 loaded successfully!');
         console.log('Language:', AppState.language);
         console.log('Progress: 100% of implementation plan - PRODUCTION READY ✨');
     </script>

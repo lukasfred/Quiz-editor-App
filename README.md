@@ -260,7 +260,7 @@ Alternatywnie, po prostu dwukrotnie kliknij na `quiz_editor.html`
 
 ## 📋 Format pytań
 
-### Pytanie Single/Multiple/Ordering:
+### Pytanie Single/Multiple/Ordering (aktualny format Android v2.11.0):
 
 ```json
 {
@@ -277,7 +277,7 @@ Alternatywnie, po prostu dwukrotnie kliknij na `quiz_editor.html`
     "Gracias",
     "Por favor"
   ],
-  "correct": [1],
+  "correct": ["Hola"],
   "difficulty": 1
 }
 ```
@@ -314,7 +314,7 @@ Alternatywnie, po prostu dwukrotnie kliknij na `quiz_editor.html`
 - **explanation**: Opcjonalne wyjaśnienie (string)
 - **imageData**: Base64 data URI obrazu (opcjonalne)
 - **options**: Tablica opcji odpowiedzi (string[])
-- **correct**: Tablica indeksów poprawnych odpowiedzi (number[], 1-based)
+- **correct**: Tablica tekstu poprawnych odpowiedzi (string[], zgodny z formatem Android)
 - **pairs**: Tablica par left-right (tylko dla pairing)
 - **difficulty**: Poziom trudności 1-5 (number)
 
@@ -488,7 +488,7 @@ W razie pytań lub problemów:
 
 ---
 
-**Wersja aplikacji:** v1.0.0 ✨
+**Wersja aplikacji:** v1.0.3 ✨
 **Data:** 2026-02-16
 **Postęp implementacji:** 100%
 **Status:** Wersja produkcyjna
